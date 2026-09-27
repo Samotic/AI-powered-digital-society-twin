@@ -1,0 +1,72 @@
+# ------------------------------------------------------------------
+# Data: never commit datasets
+# ------------------------------------------------------------------
+# Everything inside data/raw and data/processed is ignored by default.
+# Only the folder placeholders and README files stay tracked.
+data/raw/*
+data/processed/*
+!data/raw/.gitkeep
+!data/processed/.gitkeep
+!data/raw/README.md
+!data/processed/README.md
+
+# Extra safety: common dataset formats anywhere under data/
+data/**/*.csv
+data/**/*.tsv
+data/**/*.txt
+data/**/*.xlsx
+data/**/*.xls
+data/**/*.json
+data/**/*.parquet
+data/**/*.feather
+data/**/*.pkl
+data/**/*.sav
+data/**/*.dta
+data/**/*.sas7bdat
+data/**/*.db
+data/**/*.sqlite
+data/**/*.zip
+data/**/*.gz
+
+# Generated experiment outputs (configurations stay tracked)
+experiments/outputs/
+
+# ------------------------------------------------------------------
+# Secrets and credentials: never commit
+# ------------------------------------------------------------------
+.env
+.env.*
+*.pem
+*.key
+secrets/
+credentials*.json
+
+# ------------------------------------------------------------------
+# Python
+# ------------------------------------------------------------------
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+env/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+.ipynb_checkpoints/
+build/
+dist/
+
+# ------------------------------------------------------------------
+# Operating system and editors
+# ------------------------------------------------------------------
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.claude/settings.local.json

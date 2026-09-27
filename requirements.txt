@@ -1,0 +1,11 @@
+# SocietyTwin: Python dependencies
+#
+# The project is in the research and repository-setup phase, so no Python
+# packages are required yet.
+#
+# Dependencies will be added here, with pinned versions, once the
+# implementation phase begins and the team has agreed on the tools.
+# Candidates under consideration (not yet adopted):
+#   - numpy and pandas for data processing
+#   - pytest for automated tests
+#   - an agent-based modeling framework such as Mesa, or a custom engine
