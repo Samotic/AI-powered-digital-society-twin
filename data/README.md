@@ -2,6 +2,8 @@
 
 This folder will hold the data used by SocietyTwin. **No dataset is included in this repository.** The course instructor will provide the dataset at a later stage.
 
+The actual population schema will depend on the variables available in the instructor-provided dataset. No variables are assumed until the dataset has been received and reviewed.
+
 ## Folders
 
 | Folder | Purpose |

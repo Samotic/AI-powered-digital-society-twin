@@ -10,7 +10,7 @@ This folder will hold reproducible scenario configurations and the outputs of ex
 
 | Path | Contents | Tracked in Git? |
 |---|---|---|
-| `configs/` | One configuration file per scenario: population settings, scenario parameters, simulation length, and random seed | Yes |
+| `configs/` | One configuration file per scenario: population settings, scenario parameters, simulation length, and random seed. These will be read and checked by the Scenario Manager (`src/scenarios/`). | Yes |
 | `outputs/` | Generated results from each run | No (git-ignored) |
 
 These folders will be created when the first experiment is defined.
