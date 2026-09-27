@@ -1,10 +1,10 @@
-# `analysis`: aggregate statistics and result analysis
+# `analysis`: aggregate statistics and population-level results
 
 **Status:** Planned. Not implemented yet.
 
 ## Purpose
 
-This module will summarize simulation outputs at the population level and compare scenarios with the baseline.
+This module will summarize simulation outputs at the population level and compare scenarios with the baseline. It supplies statistics to Evaluation / Historical Validation and produces the **Population-Level Results** stage of the [preliminary architecture](../../docs/architecture.md). Results will be reported together with their evaluation status.
 
 ## Planned responsibilities
 

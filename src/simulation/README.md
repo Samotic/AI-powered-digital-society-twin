@@ -1,21 +1,21 @@
-# `simulation`: simulation engine and scenario execution
+# `simulation`: Simulation Engine
 
 **Status:** Planned. Not implemented yet.
 
 ## Purpose
 
-This module will advance the agent population through time and run controlled scenarios against a baseline.
+This module will implement the **Simulation Engine** stage of the [preliminary architecture](../../docs/architecture.md). It will advance the society model through time and execute the baseline and scenarios defined by the Scenario Manager (`src/scenarios/`).
 
 ## Planned responsibilities
 
 - Run the **baseline society**: the population evolving under the agent rules with no scenario intervention.
-- Run **scenarios**: the same population and random seed, with one or more conditions changed according to a scenario configuration.
+- Run **scenarios**: the same population and random seed, with one or more conditions changed according to a scenario definition from the Scenario Manager.
 - Keep random draws aligned between the baseline and each scenario, so that differences in outcomes can be attributed to the scenario change.
 - Collect aggregate outputs (for example, rates, averages, and distributions) at each timestep.
 
 ## Inputs and outputs
 
-- **Input:** agents from the `agents` module and a scenario configuration from `experiments/`
-- **Output:** aggregate time series for the baseline and each scenario, passed to the `analysis` module
+- **Input:** the society model from the `agents` module and validated scenario definitions from the `scenarios` module
+- **Output:** aggregate time series for the baseline and each scenario, passed to Evaluation / Historical Validation (`validation` and `analysis` modules)
 
 The time step, simulation length, and scenario parameters will be defined during the design phase.

@@ -1,8 +1,22 @@
 # Methodology
 
-**Status:** Planned. This document describes how the project intends to work. None of these stages has been carried out yet, and details will be refined once the instructor's dataset is available.
+**Status:** Planned. This document describes how the project intends to work. None of these stages has been carried out yet, and details will be refined once the instructor's dataset is available and the research streams have reported back.
 
-Terms such as *synthetic population*, *baseline society*, and *scenario* are defined in [project-overview.md](project-overview.md#key-terms). The research sources referred to below are listed in [sources.md](sources.md).
+Terms such as *synthetic population*, *baseline*, and *scenario* are defined in [project-overview.md](project-overview.md#key-terms). The research sources referred to below are listed in [sources.md](sources.md).
+
+## Relation to the preliminary architecture
+
+The methodology follows the stages of the [preliminary architecture](architecture.md), which is not final:
+
+| Methodology step | Architecture stage |
+|---|---|
+| 1. Data understanding, 2. Data preprocessing | Instructor / Aggregate Data, Data Processing |
+| 3. Synthetic population generation | Synthetic Population Generator |
+| 5. Agent modeling | Agent / Society Model |
+| 6. Baseline simulation, 7. Scenario definition | Scenario Manager |
+| 8. Simulation execution | Simulation Engine |
+| 4. Population validation, 10. Evaluation and historical validation, 11. Model comparison | Evaluation / Historical Validation |
+| 9. Aggregate analysis | Population-Level Results |
 
 ## 1. Data understanding
 
@@ -14,6 +28,8 @@ The project will begin by reviewing the instructor-provided dataset. We plan to 
 - missing values, inconsistencies, and known limitations.
 
 The findings will determine which variables the model can include and which population generation methods are feasible. They will be recorded in the dataset section of [data/README.md](../data/README.md).
+
+**The actual population schema will depend on the variables available in the dataset.** The team's research categories (age, occupation, location, socioeconomic characteristics, relationships, preferences, and behavior) will be matched against the dataset, and only variables that are actually present, or can be justifiably derived, will be used.
 
 ## 2. Data preprocessing
 
@@ -43,7 +59,7 @@ Before the synthetic population is used for simulation, the project will check t
 
 ## 5. Agent modeling
 
-The project will define agents and households with attributes taken from the dataset, together with behavioral rules for how their state changes over time. We plan to:
+The project will turn the synthetic population into an agent / society model: agents and households with attributes taken from the dataset, together with behavioral rules for how their state changes over time. The agent schema will be developed from the team's research on agent attributes, states, behavior, interactions, social networks, and the environment, and will include only what the data and the research can support. We plan to:
 
 - keep rules simple, transparent, and documented;
 - make every rule parameter explicit so that it can be tested and varied;
@@ -57,7 +73,7 @@ The model will simulate the synthetic population under the agent rules with no s
 
 ## 7. Scenario definition
 
-The project will define controlled scenarios, each changing one or a small number of conditions relative to the baseline. Each scenario will be described in a configuration file in `experiments/`, recording:
+The project will define controlled scenarios, each changing one or a small number of conditions relative to the baseline. Scenarios will be defined and checked by the planned Scenario Manager (`src/scenarios/`), which will not run them itself. Each scenario will be described in a configuration file in `experiments/`, recording:
 
 - the population settings and random seed;
 - the conditions that differ from the baseline;
@@ -81,9 +97,18 @@ The project will analyze simulation outputs at the population level only. We pla
 - report each scenario's difference from the baseline, together with its variation across seeds;
 - present the results in tables and charts with their assumptions stated.
 
-## 10. Historical and empirical validation
+These population-level results will be reported only together with their evaluation (step 10), so that simulated outputs are not mistaken for real-world outcomes.
 
-Where reference or historical aggregate data is available, the project will compare simulated outputs with observed values. The approach will draw on the literature on empirical validation of agent-based models:
+## 10. Evaluation and historical validation
+
+The project will evaluate the model at the aggregate level before reporting any results. The planned evaluation areas are:
+
+- **Statistical similarity:** how closely the synthetic population and simulated aggregates match the reference statistics.
+- **Aggregate-level evaluation:** whether population-level indicators behave plausibly over time.
+- **Historical and empirical validation:** where reference or historical aggregate data is available and permitted, comparing simulated outputs with observed values.
+- **Scenario consistency:** for example, checking that a scenario with no change reproduces the baseline, and that scenario effects are consistent across random seeds.
+
+The approach will draw on the literature on empirical validation of agent-based models:
 
 - Windrum, Fagiolo and Moneta (2007) discuss validation challenges and compare approaches such as indirect calibration, the Werker–Brenner approach, and the history-friendly approach.
 - Collins, Koehler and Lynch (2024) give an overview of validation methods, including empirical validation, docking, sampling, visualization, and bootstrapping, and discuss when each is appropriate.
