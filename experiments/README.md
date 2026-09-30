@@ -1,27 +1,10 @@
-# Experiments
+# Experiments (placeholder)
 
-**Status:** Planned. No experiments have been run yet.
+**Status:** Placeholder from the research phase. No experiments have been run.
 
-## Purpose
+In the PROPOSED v2 architecture, experiments are configured in the Playground and recorded in the experiment registry ([experiment-system.md](../docs/experiment-system.md)):
 
-This folder will hold reproducible scenario configurations and the outputs of experiment runs.
+- **Instruments and experiment presets** (versioned, tracked in Git) move to `configs/`.
+- **Trial records, raw responses, and aggregates** (generated, git-ignored) are written to `data/results/`.
 
-## Planned layout
-
-| Path | Contents | Tracked in Git? |
-|---|---|---|
-| `configs/` | One configuration file per scenario: population settings, scenario parameters, simulation length, and random seed. These will be read and checked by the Scenario Manager (`src/scenarios/`). | Yes |
-| `outputs/` | Generated results from each run | No (git-ignored) |
-
-These folders will be created when the first experiment is defined.
-
-## Reproducibility
-
-Each experiment should record enough information to be repeated exactly:
-
-- the scenario configuration file;
-- the random seed or seeds;
-- the Git commit of the code used;
-- the version of the dataset used (see [data/README.md](../data/README.md)).
-
-Running the same configuration with the same seed, code version, and dataset should produce the same results.
+This folder will be removed once its role has moved ([migration plan](../docs/migration-plan.md)). Generated outputs in `experiments/outputs/` and `experiments/results/` are git-ignored.

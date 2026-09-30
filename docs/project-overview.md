@@ -1,115 +1,84 @@
 # Project overview
 
-- **Project:** SocietyTwin — AI-Powered Digital Society Twin
+- **Project:** SocietyTwin — AI-Powered Digital Society Twin for Türkiye
 - **Course:** Engineering Design II
-- **Status:** Research, requirements analysis, and initial repository setup
+- **Status:** v2 architecture **PROPOSED**; implementation not started
+- **Full design:** [SocietyTwin v2 Architecture Report](societytwin-v2-architecture.md)
 
-> **SocietyTwin is intended for population-level research and simulation, not individual-level prediction.**
+> **SocietyTwin is intended for population-level research and simulation, not individual-level prediction.** Its personas are synthetic and do not represent real Turkish citizens.
+
+## Direction (CONFIRMED by the instructor)
+
+- SocietyTwin focuses **only on Türkiye**.
+- **5,000 synthetic agents is too small.** The population must be substantially larger, and the architecture must scale.
+- SocietyTwin should have capabilities **inspired by large-scale synthetic-persona / AI-society systems**, with MatrAIx / Persona-8B as the main reference. SocietyTwin is not a clone of MatrAIx.
+
+The exact population size is not specified by the instructor (**OPEN DECISION**).
 
 ## Problem
 
-Real societies are complex systems. The characteristics, circumstances, and interactions of individuals and households combine to produce population-level patterns, such as the distribution of income or changes in employment, that cannot be understood by looking at any single person. These patterns are difficult to study directly: real-world experiments on a population are usually impractical or unethical, and aggregate statistics alone do not show how individual-level mechanisms produce them.
+Researchers and students who want to explore how different groups in Türkiye might respond to a question or a hypothetical situation cannot easily run large studies with real people, and real individuals' data is protected. LLM-based simulated respondents are a possible tool for exploration, but the literature shows that they can misrepresent or flatten groups and that their results can be fragile. Existing synthetic-persona systems are global or product-oriented rather than grounded in Turkish official statistics.
 
-## Proposed approach
+SocietyTwin addresses a narrower, testable problem: **generate a synthetic population of Türkiye whose statistical properties are traceable to official sources and measurably validated, and provide a reproducible way to sample from it and run bounded AI-persona experiments with explicit limitations.**
 
-SocietyTwin will create a synthetic digital representation of a population using aggregate statistical information and agent-based simulation.
+## Research questions (PROPOSED)
 
-1. Aggregate statistics provided by the instructor will be processed and used to generate a **synthetic population**: artificial individuals and households whose combined characteristics match the real statistics, but who do not correspond to any real person.
-2. The synthetic population will become an **agent / society model**, in which each agent or household has documented attributes and behavioral rules.
-3. A **Scenario Manager** will define a **baseline** and a set of controlled **scenarios**, each changing one condition at a time.
-4. A **Simulation Engine** will run the baseline and each scenario over time.
-5. The outputs will go through **evaluation and historical validation** against reference data before being reported as **population-level results**.
+**Primary.** To what extent can a synthetic population of Türkiye generated only from official aggregate statistics reproduce the source distributions and their published cross-tabulations as its size grows, and under what conditions do AI agents instantiated from its personas respond consistently with their persona attributes and comparably to held-out Turkish survey aggregates?
 
-This follows the [preliminary architecture](architecture.md), which is not final.
+**Secondary.**
 
-## Main stages
+1. How much does dependency-aware generation reduce error on held-out cross-tabulations compared with independent-attribute sampling, and how does fidelity change from 10K to 1M records, particularly for small provinces?
+2. What are the runtime, memory, and storage costs of generating, storing, and querying 10K, 100K, and 1M records on a single machine?
+3. How consistently do LLM agents express their assigned attributes across repeated runs, prompt perturbations, and models?
+4. For survey items with published TÜİK aggregates that were not used in generation, how close are subgroup response distributions of persona agents to the real aggregates, compared with simple baselines?
 
-| # | Stage | Description | Architecture stage |
-|---|---|---|---|
-| 1 | Analyze the instructor-provided dataset | Review the variables, level of aggregation, coverage, and limitations of the data. | Instructor / Aggregate Data, Data Processing |
-| 2 | Generate the synthetic population | Create synthetic individuals and households that reproduce the source statistics. | Synthetic Population Generator |
-| 3 | Validate the synthetic population | Measure how closely the synthetic population matches the source statistics. | Evaluation / Historical Validation |
-| 4 | Define agent behavior | Specify transparent rules for how agents and households change over time. | Agent / Society Model |
-| 5 | Create the baseline society | Simulate the population with no scenario intervention. | Scenario Manager, Simulation Engine |
-| 6 | Define controlled scenarios | Specify the conditions that each scenario changes relative to the baseline. | Scenario Manager |
-| 7 | Run simulations | Execute the baseline and scenarios reproducibly, using recorded random seeds. | Simulation Engine |
-| 8 | Collect aggregate outputs | Record population-level indicators at each timestep. | Simulation Engine |
-| 9 | Compare results | Compare each scenario with the baseline, and simulated outputs with reference data. | Evaluation / Historical Validation |
-| 10 | Validate and document findings | Assess model validity and report results together with their limitations. | Evaluation / Historical Validation, Population-Level Results |
+The previous research question (comparing ABM, Cohort-Component / Matrix Projection, and ML models) is superseded. Whether the TÜBİTAK 2209-B proposal can be revised accordingly is an **OPEN DECISION** ([report §5](societytwin-v2-architecture.md#5-research-questions)).
 
-## In Scope
+## Approach
 
-A "digital society twin" can easily grow into an unrealistically large project, so the scope is deliberately limited. The following are **planned capabilities**. None of them has been implemented yet.
+1. **Data:** ingest, validate, and harmonise official TÜİK tables ([data-strategy.md](data-strategy.md)).
+2. **Schema:** a small, evidence-backed Türkiye persona schema with provenance for every attribute ([persona-schema.md](persona-schema.md)).
+3. **Generation:** dependency-aware, vectorised generation of population builds of 10K, 100K, and 1M records.
+4. **Validation:** statistical representativeness and conditional consistency, including held-out tables ([validation-strategy.md](validation-strategy.md)).
+5. **Cohorts:** reproducible filtering and sampling with weights.
+6. **Experiments:** SURVEY and SCENARIO experiments in which a small number of sampled personas are instantiated as AI agents ([experiment-system.md](experiment-system.md)).
+7. **Analysis:** subgroup comparison, persona-consistency and experiment-validity checks, and full reproducibility.
 
-- **Processing instructor-provided aggregate/statistical data:** cleaning and harmonizing the dataset supplied by the instructor.
-- **Synthetic population generation:** creating artificial individuals and households that reproduce the aggregate statistics.
-- **Population-level agent representation:** representing the synthetic population as agents and households whose attributes come from the available data.
-- **Agent-based social/economic simulation:** simulating how the agent population changes over time under documented behavioral rules.
-- **Controlled scenario definition:** defining a baseline and controlled scenarios through the Scenario Manager.
-- **Scenario execution:** running the baseline and each scenario reproducibly in the Simulation Engine.
-- **Aggregate result analysis:** computing population-level indicators and comparing scenarios with the baseline.
-- **Statistical similarity analysis:** measuring how closely the synthetic population and simulated outputs match the reference statistics.
-- **Historical/empirical validation where suitable data exists:** comparing simulated outputs with historical or observed aggregate data, only where such data is available and permitted.
-- **Model comparison:** comparing the agent-based model with simpler alternatives to check whether its complexity is justified.
-- **Reproducible experiments:** recording configurations, random seeds, code versions, and dataset versions so that every experiment can be repeated.
-- **Population-level visualization/results:** presenting aggregate results in tables and charts, together with their assumptions and limitations.
+## Scope
 
-## Out of Scope
+**In scope (MVP, PROPOSED):** Türkiye aggregate data ingestion; persona schema; dependency-aware generation up to 1M records; statistical validation; cohort sampling; SURVEY and SCENARIO experiments with bounded AI activation; telemetry; subgroup analysis; reproducibility; a basic web playground.
 
-SocietyTwin will **not** include, attempt, or support:
+**Stretch:** CHAT environment; linked households; income quintile; microdata-based generator; full-scale (about 86.1 million) build; vectorised population dynamics with the Cohort-Component / Matrix Projection benchmark; maps; cross-model audits.
 
-- Predicting the behavior of specific real individuals
-- Individual surveillance
-- Identifying real people
-- Reconstructing identifiable individuals from aggregate or synthetic data
-- Real-time surveillance systems
-- Claiming perfect prediction of society
-- Automatically making government or political decisions
-- Treating simulation results as guaranteed real-world outcomes
-- Building an unlimited or full digital replica of society
-- Using private or personally identifiable data without authorization
+**Future work:** web and app environments; interacting LLM societies and social networks; survey-grounded dispositions; pre-registered validity tests; economic and policy scenarios.
 
-**SocietyTwin is intended for population-level research and simulation, not individual-level prediction.**
+## Out of scope
 
-## Population-level focus
+SocietyTwin will **not**:
 
-SocietyTwin studies aggregate, population-level behavior.
-
-- Synthetic agents are statistical constructs. They are generated to reproduce aggregate distributions and do not represent real people.
-- Results will be reported as population-level quantities, such as rates, averages, and distributions.
-- The model will not be used, and is not designed, to make predictions or decisions about identifiable individuals.
-
-## Dependency on the instructor dataset
-
-The instructor will provide the dataset at a later stage. **The actual population schema will depend on the variables available in that dataset.** Research categories such as age, occupation, location, socioeconomic characteristics, relationships, preferences, and behavior guide the team's research, but none of them is assumed to exist in the data.
-
-The choice of population generation method, the agent schema, and the scenarios that can be studied all depend on the dataset. Until it arrives, the project is limited to research, requirements analysis, and design.
-
-## Items still to be defined
-
-The following items are still being researched or defined. They are listed here so that they are not assumed.
-
-| Item | Responsible |
-|---|---|
-| Target users | Bejan (Project Manager / System Architect) |
-| Final system boundaries and main capabilities | Bejan, integrating all research streams |
-| Population schema, agent schema, and simulation concept | Koray (Data + Population + Simulation Research) |
-| Technology choices and their justification | Pakhlavon (Technical Architecture / Technologies) |
-| Existing work, gap, and SocietyTwin's contribution | Azra (Existing Systems / Similar Projects) |
-| Academic foundations and final source selection | Sam (Literature Research) |
-
-See [team-responsibilities.md](team-responsibilities.md) and [research-integration.md](research-integration.md).
+- cover any country other than Türkiye;
+- predict the behaviour of specific real individuals;
+- identify, reconstruct, or impersonate real people;
+- support individual surveillance or real-time surveillance systems;
+- model special-category attributes (ethnic origin, religion or sect, political opinion, health, and other categories under KVKK Article 6) or mother tongue;
+- run an LLM for every stored record;
+- claim that its personas represent real Turkish citizens or that its results predict Türkiye's future;
+- make or automate government or political decisions;
+- use private or personally identifiable data without authorisation.
 
 ## Key terms
 
-| Term | Meaning in this project |
+| Term | Meaning |
 |---|---|
-| Instructor / aggregate data | The aggregate statistical dataset to be provided by the instructor. |
-| Synthetic population | A generated set of artificial individuals and households whose aggregate characteristics match real statistics. |
-| Agent / society model | The synthetic population represented as agents and households with attributes, states, and behavioral rules. |
-| Baseline (baseline society) | The society model simulated with no scenario intervention; the reference for all comparisons. |
-| Scenario | A controlled change to one or more conditions, simulated with the same population and random seed as the baseline. |
-| Scenario Manager | The planned module that defines and checks the baseline and scenarios. It does not run them. |
-| Simulation Engine | The planned module that runs the baseline and scenarios over time. |
-| Evaluation / historical validation | Assessing how well the synthetic population and simulation outputs agree with reference or historical data. |
-| Population-level results | Aggregate indicators, such as rates, averages, and distributions, reported with their evaluation status. |
+| Population record | A lightweight, statistically generated fictional member of Türkiye's synthetic population |
+| Persona | A richer view of one record: descriptors, provenance, and a persona card |
+| Active AI agent | A persona temporarily instantiated with an LLM for one experiment trial |
+| Population build | One generated population (schema version, data version, generator version, seed, size) |
+| Cohort | A filtered and sampled set of records used by an experiment |
+| Trial | One agent completing one item in one environment |
+| Provenance class | How an attribute was obtained: official joint, official conditional, modelled, derived, assumed, or generated text |
+| Held-out table | An official table deliberately not used in generation, kept for validation |
+
+## Superseded material
+
+The v1.0 architecture (5,000-agent demographic prototype) is archived in [archive/architecture-v1-demographic.md](archive/architecture-v1-demographic.md). What was kept, changed, or dropped is described in the [migration plan](migration-plan.md).

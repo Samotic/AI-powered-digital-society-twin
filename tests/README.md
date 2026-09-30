@@ -1,18 +1,16 @@
 # Tests
 
-**Status:** Planned. No tests exist yet, because no code has been implemented.
+**Status:** Planned. No tests exist yet, because no code has been written.
 
-Tests will be written alongside each module as it is implemented, and are planned to use `pytest`.
+The PROPOSED v2 testing strategy is in [report §28](../docs/societytwin-v2-architecture.md#28-testing-strategy). In summary:
 
-## Planned test areas
-
-| Area | What the tests will check |
+| Level | Examples |
 |---|---|
-| Population generation | The generator produces a population of the requested size with valid attribute values. |
-| Distribution matching | The synthetic population's distributions match the source statistics within agreed tolerances. |
-| Agent rules | Each behavioral rule changes agent state as documented, including edge cases. |
-| Simulation reproducibility | The same configuration and random seed always produce identical results. |
-| Scenario configuration | Valid configurations are accepted and invalid ones are rejected with a clear error. |
-| Validation metrics | Goodness-of-fit measures return correct values on small, hand-checked examples. |
+| Unit | IPF convergence on small tables; allocation preserves totals; masks respected; metrics match hand-computed values |
+| Property-based (Hypothesis) | Totals preserved, zero hard-constraint violations, same seed gives identical output, independence from partition processing order |
+| Schema and configuration | Schema, instrument, and experiment configurations validate; invalid ones are rejected |
+| Integration | Artificial data → 10K build → validation → cohort → SURVEY experiment with the stub model → results |
+| API and frontend | FastAPI contract tests; Vitest component tests |
+| Performance | 10K / 100K / 1M benchmarks (manual or scheduled, not in every CI run) |
 
-Tests will use small, clearly artificial inputs created inside the tests themselves. They will not depend on the instructor's dataset.
+Rules: no real LLM calls and no real TÜİK data in CI. Small, clearly artificial fixtures live in `tests/fixtures/`.

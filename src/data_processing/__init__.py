@@ -1,1 +1,1 @@
-"""Loading and cleaning of the instructor-provided dataset (planned; not implemented yet)."""
+"""Placeholder from the research phase; see docs/migration-plan.md for its v2 target (not implemented)."""

@@ -1,0 +1,24 @@
+# SocietyTwin data manifest
+#
+# One entry per downloaded dataset. This file records metadata only; the data
+# files themselves stay out of Git (see data/README.md).
+#
+# No dataset has been downloaded or approved yet. Planned sources are listed in
+# docs/data-strategy.md. Reuse terms for TÜİK portal tables are an OPEN DECISION.
+#
+# Entry template (copy it into `datasets:` and fill in every field):
+#
+#   - id:              short unique identifier
+#     source:          publishing organisation, e.g. TÜİK
+#     title:           official table or release title
+#     url:             page the data was downloaded from
+#     reference_year:  year (or period) the statistics describe
+#     geography:       geographic level (Türkiye, NUTS-1, NUTS-2, NUTS-3, district)
+#     variables:       list of variables and categories used
+#     licence:         licence or terms of use (or OPEN DECISION)
+#     download_date:   YYYY-MM-DD
+#     checksum:        sha256 of the downloaded file
+#     file:            path under data/raw/
+#     held_out:        true if reserved for validation and not used in generation
+
+datasets: []

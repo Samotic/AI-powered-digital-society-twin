@@ -1,1 +1,1 @@
-"""Validation against reference statistics and historical observations (planned; not implemented yet)."""
+"""Placeholder from the research phase; see docs/migration-plan.md for its v2 target (not implemented)."""

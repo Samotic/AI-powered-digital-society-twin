@@ -1,78 +1,149 @@
-# Architecture
+# Architecture Reference (v2, PROPOSED)
 
-> **Preliminary architecture.** This is the current conceptual design, based on the team's Project Management document. It is not final and will change as the research streams report back and once the instructor's dataset has been reviewed. No components have been implemented yet.
+> **Status: PROPOSED**, awaiting instructor and team approval. Nothing is implemented yet.
+>
+> This is the **module and interface reference**. The reasoning behind each decision, the diagrams (system context, data flow, population generation, persona-to-agent activation, experiment lifecycle, deployment), and the MVP and roadmap are in the **[SocietyTwin v2 Architecture Report](societytwin-v2-architecture.md)**.
+>
+> The previous architecture (v1.0, a 5,000-agent demographic prototype comparing ABM, Cohort-Component / Matrix Projection, and ML models) is **SUPERSEDED** and archived in [archive/architecture-v1-demographic.md](archive/architecture-v1-demographic.md).
 
-## Conceptual pipeline
+## 1. Layers
 
-```mermaid
-flowchart TD
-    A["Instructor / Aggregate Data"]
-    B["Data Processing"]
-    C["Synthetic Population Generator"]
-    D["Agent / Society Model"]
-    E["Scenario Manager"]
-    F["Simulation Engine"]
-    G["Evaluation / Historical Validation"]
-    H["Population-Level Results"]
+| Layer | Modules | Uses an LLM? |
+|---|---|---|
+| Data | `ingestion` | No |
+| Population | `persona` (schema), `population`, `sampling` | No |
+| Experiments | `scenarios`, `experiments`, `agents` | Only `agents` |
+| Analysis | `evaluation`, `simulation` (optional) | No |
+| Platform | `registry`, `api`, `frontend` | No |
 
-    A --> B
-    B --> C
-    C --> D
-    D --> E
-    E --> F
-    F --> G
-    G --> H
-    A -.->|reference / historical statistics| G
+**Dependency rule.** Population and analysis modules must not import web frameworks or LLM code, so that they can be tested and run on their own. Only `agents` talks to model providers. `api` contains no business logic: it validates requests and calls the other modules.
+
+## 2. Target package layout
+
+```text
+src/societytwin/
+├── ingestion/      data acquisition records, validation, harmonisation
+├── persona/        schema definitions (versioned) and persona rendering
+├── population/     dependency model, IPF fitting, generator, build writer
+├── sampling/       cohort filters, sampling designs, weights
+├── scenarios/      instruments and scenario conditions (versioned)
+├── experiments/    experiment manager, environments (survey, scenario), trial orchestration
+├── agents/         model adapters, prompt templates, activation, cache, budget
+├── simulation/     optional population dynamics and Cohort-Component benchmark (STRETCH)
+├── evaluation/     validation metrics, subgroup analysis, reports
+├── registry/       manifests, jobs, provenance, persistence
+└── api/            FastAPI application
+frontend/           Next.js + TypeScript playground
+configs/            schema YAML, instruments, experiment presets
+tests/              unit, property, integration tests and small artificial fixtures
 ```
 
-Solid arrows show the main flow of data through the pipeline. The dashed arrow shows that Evaluation / Historical Validation also uses reference statistics directly: the aggregate data the population was built from, and historical data where suitable, permitted data exists.
+The current repository still has the research-phase placeholders under `src/`. They are **not** moved in this documentation change; see [migration-plan.md](migration-plan.md).
 
-## Stages
+## 3. Module specifications
 
-| Stage | Planned role | Planned location |
-|---|---|---|
-| Instructor / Aggregate Data | Aggregate statistical data provided by the instructor. It is the source for population generation and a reference for evaluation. It is never committed to Git. | `data/raw/` |
-| Data Processing | Cleans and harmonizes the raw data into consistent aggregate tables. | `src/data_processing/` → `data/processed/` |
-| Synthetic Population Generator | Creates artificial individuals and households whose aggregate characteristics match the processed statistics, using a recorded random seed. The population is regenerated from its configuration and seed rather than stored. | `src/population/` |
-| Agent / Society Model | Turns the synthetic population into agents and households with attributes, states, and documented behavioral rules. Interactions, social networks, and the environment will be included only where the research and data support them. | `src/agents/` |
-| Scenario Manager | Defines the baseline and the controlled scenarios, checks scenario configurations, and makes sure each scenario shares its baseline's population and random seed. It does not run simulations. | `src/scenarios/`, `experiments/configs/` |
-| Simulation Engine | Advances the society model through time for the baseline and each scenario, keeping random draws aligned between them, and records aggregate outputs at each timestep. | `src/simulation/` |
-| Evaluation / Historical Validation | Checks the statistical similarity of the synthetic population to the source data, compares simulated aggregates with reference or historical data, checks scenario consistency, and compares the model with simpler alternatives. | `src/validation/` (using statistics from `src/analysis/`) |
-| Population-Level Results | Aggregate indicators and scenario-versus-baseline comparisons, reported together with their evaluation status and known limitations. | `src/analysis/`, `experiments/outputs/` (git-ignored) |
+### `ingestion`
+- **Purpose:** turn official downloads into validated, harmonised constraint tables.
+- **Input:** files in `data/raw/`; entries in `data/manifest.yaml`.
+- **Output:** harmonised marginals and cross-tabulations (Parquet) in `data/processed/`; an ingestion report.
+- **Main responsibilities:** checksum and manifest checks; schema and value validation; geography mapping to İBBS codes; age-band, education, occupation, and sector harmonisation; reconciliation with ADNKS totals; marking held-out tables.
+- **Dependencies:** pandas, PyArrow, Pydantic.
+- **Testing:** artificial tables with known errors (missing cells, bad codes, inconsistent totals) must be reported; harmonisation mappings are round-trip tested.
 
-### Why evaluation comes before results
+### `persona`
+- **Purpose:** define the versioned persona schema and render personas from records.
+- **Input:** schema files in `configs/schema/`; population records.
+- **Output:** schema objects (attributes, categories, parents, provenance, constraints); persona cards and unknowns statements.
+- **Main responsibilities:** schema loading and validation; category encodings; hard-constraint definitions; template-based persona rendering; the synthetic-data label.
+- **Dependencies:** Pydantic; a template engine.
+- **Testing:** schema validation (acyclic DAG, known categories, valid constraints); rendering snapshots; no excluded attribute can appear in a card.
 
-In this pipeline, results are reported only after they have been evaluated. Every population-level result should come with a statement of how well the model agrees with the reference data, so that simulated outputs are not mistaken for real-world facts.
+### `population`
+- **Purpose:** generate population builds.
+- **Input:** processed tables; schema version; N; seed.
+- **Output:** a partitioned Parquet build and its build manifest.
+- **Main responsibilities:** IPF fitting of conditionals; controlled-rounding allocation to province × sex × age cells; vectorised DAG-ordered sampling with masks; seeded streams per partition; writing builds.
+- **Dependencies:** NumPy, pandas (small tables), PyArrow, `persona`, `registry`.
+- **Testing:** IPF convergence on small tables; totals preserved; zero hard-constraint violations; same seed gives an identical checksum; independence from partition processing order (property-based tests).
 
-## Design principles
+### `sampling`
+- **Purpose:** select reproducible cohorts from a build.
+- **Input:** build ID; structured filter specification; sample size; sampling method; seed.
+- **Output:** cohort manifest (requested and realised) with record IDs and inclusion weights.
+- **Main responsibilities:** translate filters to DuckDB queries safely; simple random and stratified sampling; weight computation; realised subgroup counts.
+- **Dependencies:** DuckDB, `registry`.
+- **Testing:** same inputs give the same IDs; stratum sizes match the design; weights sum to the filtered population; invalid filters are rejected.
 
-- **Population-level focus.** Components produce and report aggregate results. SocietyTwin is intended for population-level research and simulation, not individual-level prediction.
-- **Data-driven schema.** The population and agent attributes will depend on the variables actually available in the instructor-provided dataset. None are assumed in advance.
-- **Reproducibility.** The same dataset version, configuration, random seed, and code version should always produce the same results.
-- **Separation of data and code.** Datasets stay outside Git. The processed data and synthetic population can be regenerated by code.
-- **Modularity.** Each stage has its own module with clear inputs and outputs, so that it can be developed, tested, and validated independently.
-- **Transparency.** Assumptions, parameters, and behavioral rules are documented alongside the code.
-- **Justified technology.** Every technology must answer the question "Why does SocietyTwin actually need this technology?" before it is adopted.
+### `scenarios`
+- **Purpose:** define versioned instruments and scenario conditions.
+- **Input:** instrument files in `configs/instruments/`.
+- **Output:** validated instrument objects with answer schemas; condition definitions (baseline and treatments).
+- **Main responsibilities:** instrument validation; answer JSON schemas; random assignment of conditions with a seed; carrying the v1 demographic scenario parameters for the optional dynamics engine.
+- **Dependencies:** Pydantic.
+- **Testing:** instrument validation; condition assignment is balanced and reproducible.
 
-## Changes from the initial repository architecture
+### `experiments`
+- **Purpose:** run experiments from configuration to results.
+- **Input:** cohort; instrument and conditions; environment; model configuration; seeds; budget.
+- **Output:** experiment manifest; trial records; lifecycle state.
+- **Main responsibilities:** configuration validation and cost estimate; lifecycle (draft → validated → queued → running → completed / failed / stopped → analysed); SURVEY and SCENARIO environments (CHAT is STRETCH); trial orchestration through `agents`.
+- **Dependencies:** `sampling`, `scenarios`, `agents`, `persona`, `registry`.
+- **Testing:** end-to-end runs with the stub model; lifecycle transitions; budget stop; cancellation.
 
-The first version of this document (initial repository setup) used a ten-component diagram. This version aligns it with the Project Management document:
+### `agents`
+- **Purpose:** instantiate personas as AI agents for single trials.
+- **Input:** persona card; instrument item and answer schema; prompt template version; model configuration.
+- **Output:** a validated structured answer with usage information.
+- **Main responsibilities:** provider-independent adapter interface; stub model; prompt templates (versioned); structured-output validation with bounded retries; asynchronous execution with concurrency limits; response cache; token and cost accounting; budget guard.
+- **Dependencies:** provider SDKs or HTTP client (behind the adapter), Pydantic, `registry`.
+- **Testing:** stub model only in CI; cache-key determinism; retry and invalid-output handling; no credentials in logs.
 
-- **Scenario Manager** is now a separate stage with its own planned module, `src/scenarios/`, instead of a configuration input to the Simulation Engine.
-- **Synthetic Population** and **Agent Model** are combined into one **Agent / Society Model** stage. The generated population is treated as the generator's output.
-- **Analysis** and **Validation** are combined into **Evaluation / Historical Validation**, followed by **Population-Level Results** as the final stage.
+### `simulation` (optional, STRETCH)
+- **Purpose:** population dynamics over records (aging, births, deaths, migration) and the Cohort-Component / Matrix Projection benchmark carried over from v1.
+- **Input:** a build; TÜİK vital statistics and life tables; scenario parameters.
+- **Output:** time-shifted builds; aggregate time series in the Common Result Schema.
+- **Main responsibilities:** vectorised yearly transitions; accounting identity checks; docking against the cohort-component benchmark.
+- **Dependencies:** NumPy, SciPy (optional), `population`.
+- **Testing:** accounting identity (final = initial + births − deaths + net migration); determinism with seeds.
 
-## Open architecture questions
+### `evaluation`
+- **Purpose:** validation and subgroup analysis.
+- **Input:** builds; processed and held-out tables; trial records.
+- **Output:** validation reports; Common Result Schema aggregates; performance and cost summaries.
+- **Main responsibilities:** TVD, JSD, MAE, RMSE, SRMSE, Cramér's V difference, constraint violation rate, rare-cell recall; persona-consistency and experiment-validity metrics; weighted subgroup estimates with intervals ([validation-strategy.md](validation-strategy.md)).
+- **Dependencies:** NumPy, SciPy, DuckDB.
+- **Testing:** metrics against hand-computed examples; edge cases (zero cells, single category).
 
-These questions are assigned to the research streams described in [team-responsibilities.md](team-responsibilities.md) and will be resolved before the architecture is finalized.
+### `registry`
+- **Purpose:** provenance and job state.
+- **Input:** manifests and status updates from other modules.
+- **Output:** persisted build, cohort, and experiment records; job queue.
+- **Main responsibilities:** manifest storage; job table with safe concurrent claiming; trial index; experiment history.
+- **Dependencies:** PostgreSQL (SQLite for local development and tests).
+- **Testing:** transactions; concurrent job claiming; migrations.
 
-| Question | Research stream |
+### `api`
+- **Purpose:** expose the platform to the frontend.
+- **Input:** HTTP requests.
+- **Output:** JSON responses; job submissions; exports.
+- **Main responsibilities:** the endpoints in [report §21](societytwin-v2-architecture.md#21-api-architecture); request validation; roles (if enabled); synthetic-data labels in responses.
+- **Dependencies:** FastAPI, all modules above.
+- **Testing:** contract tests with the FastAPI test client.
+
+### `frontend`
+- **Purpose:** the Experiment Playground ([experiment-system.md §7](experiment-system.md#7-playground-pages-proposed)).
+- **Input:** API responses.
+- **Output:** pages for populations, cohorts, experiments, monitoring, results, and registry.
+- **Main responsibilities:** display only; never computes statistics; shows the synthetic-data label on every page with persona output.
+- **Dependencies:** Next.js, TypeScript, Recharts.
+- **Testing:** Vitest component tests; typed API client.
+
+## 4. Data contracts
+
+| Contract | Defined in |
 |---|---|
-| Which variables can the population and agent schemas include? | Koray (Data + Population + Simulation Research), after the dataset arrives |
-| Do agents interact directly, for example through social networks, or only through shared conditions? | Koray |
-| Which programming language, frameworks, and tools does SocietyTwin actually need, and why? | Pakhlavon (Technical Architecture / Technologies) |
-| Does any part of the system need LLM-based agents, or is a rule-based model sufficient? | Pakhlavon and Sam (Literature Research) |
-| What do existing systems do, and what gap will SocietyTwin address? | Azra (Existing Systems / Similar Projects) |
-| What are the final system boundaries and capabilities? | Bejan (Project Manager / System Architect) |
-
-The detailed design, including data formats and the interfaces between stages, will be defined after these questions have been answered.
+| Persona schema and provenance classes | [persona-schema.md](persona-schema.md) |
+| Data manifest | [`data/manifest.yaml`](../data/manifest.yaml), [data-strategy.md](data-strategy.md) |
+| Build, cohort, and experiment manifests | [report §20](societytwin-v2-architecture.md#20-reproducibility) |
+| Trial record and Common Result Schema | [experiment-system.md §6](experiment-system.md#6-telemetry-and-result-model) |
+| Validation report | [validation-strategy.md](validation-strategy.md) |
