@@ -1,100 +1,98 @@
 # SocietyTwin — AI-Powered Digital Society Twin for Türkiye
 
-**Engineering Design II · University research project**
+SocietyTwin is an Engineering Design II research project that aims to build a synthetic population of Türkiye from official statistics and use it for controlled, reproducible experiments with AI-powered personas. It is meant for population-level exploration and hypothesis generation, not for predicting individual behaviour.
 
-> **Status:** v2 architecture **PROPOSED**. The overall direction is approved for refinement; specific decisions await instructor and team approval. The repository contains documentation and placeholder folders only; implementation has not started.
+## Project Status
 
-SocietyTwin is being designed as a **Türkiye-only, data-grounded synthetic society platform**. It will:
-
-1. generate a synthetic population of Türkiye, at configurable scale, from **official aggregate statistics** (primarily TÜİK);
-2. **validate** that the population reproduces the published Turkish distributions and the relationships between attributes;
-3. **sample cohorts**, construct personas, and turn a small number of them into **AI agents** for reproducible survey and scenario experiments;
-4. analyse results **by subgroup**, with uncertainty and limitations stated.
-
-> **SocietyTwin is for population-level research, exploration, and hypothesis generation.** Its personas are synthetic. They do not represent real Turkish citizens, and its results are not predictions of real behaviour.
+- The Türkiye-only, large-scale direction comes from the latest instructor feedback.
+- The v2 architecture was drafted in response to that feedback ([docs/](docs/)).
+- Detailed architecture and implementation decisions still require instructor and team review.
+- Implementation has not started; the repository contains documentation and placeholder folders.
 
 ## Why Türkiye
 
-- **Instructor requirement (CONFIRMED):** SocietyTwin focuses only on Türkiye.
-- **Official data:** TÜİK publishes register-based population statistics (ADNKS) every year, down to district level. The 2025 resident population was **86,092,168**. TÜİK also publishes survey statistics on education, labour, households, and ICT use at national and regional levels.
-- **Turkish structure:** every synthetic record belongs to one of Türkiye's 81 provinces (İBBS NUTS-3), with its NUTS-2 and NUTS-1 regions. Attributes use TÜİK's official categories, so synthetic results can be compared directly with Turkish statistics.
+- The instructor asked for a project focused only on Türkiye.
+- TÜİK (Turkish Statistical Institute) publishes official population statistics every year down to district level (2025: 86,092,168 residents), plus survey statistics on education, employment, households, and internet use.
+- Every synthetic record belongs to one of Türkiye's 81 provinces and uses TÜİK's official categories, so results can be compared with Turkish statistics.
 
-## Why v2
-
-The instructor confirmed three things:
-- SocietyTwin must focus **only on Türkiye**.
-- **5,000 synthetic agents is too small.** The system should support a **substantially larger, scalable** population.
-- **Large-scale synthetic-persona systems such as MatrAIx** are an important inspiration.
-
-SocietyTwin is **inspired by architectural ideas from large-scale synthetic persona systems such as MatrAIx**. It is its own Türkiye-specific academic project, not a clone ([report §7](docs/societytwin-v2-architecture.md#7-reference-systems)). The earlier 5,000-agent demographic design is superseded and [archived](docs/archive/architecture-v1-demographic.md).
-
-## Core idea: records, personas, and agents
-
-| Level | What it is | Scale | Uses an LLM? |
-|---|---|---|---|
-| **Population record** | A lightweight, statistically generated fictional member of Türkiye's population | Configurable builds; benchmark scales 10K, 100K, 1M+ | Never |
-| **Persona** | A richer view of a sampled record: descriptors, provenance, persona card | Per cohort, on demand | No (template-based) |
-| **Active AI agent** | A persona temporarily instantiated with an LLM for one experiment trial | Small, budget-bound pilots | Yes |
-
-**Population size and the number of AI agents are independent.** LLM calls grow with the experiment cohort, not with the population. The final target population size will be set from instructor requirements, available data, and benchmarks (OPEN DECISION). 1M is PROPOSED as the largest MVP benchmark ([report §12](docs/societytwin-v2-architecture.md#12-scalability-strategy)).
-
-## Pipeline (simplified)
+## Core Idea
 
 ```mermaid
 flowchart LR
-    A["TÜİK aggregate data"] --> B["Ingestion and harmonisation"]
-    B --> C["Dependency-aware generator"]
-    C --> D[("Synthetic population<br/>configurable size")]
-    D --> E["Cohort sampling<br/>and personas"]
-    E --> F["AI persona agents<br/>SURVEY or SCENARIO"]
-    F --> G["Subgroup analysis"]
-    G --> H["Validation"]
-    H --> I["Playground"]
+    A["Türkiye official statistics<br/>TÜİK"] --> B["Synthetic population"]
+    B --> C["Cohort sampling"]
+    C --> D["Personas"]
+    D --> E["Selected AI agents"]
+    E --> F["Controlled experiments"]
+    F --> G["Analysis and validation"]
 ```
 
-The full data flow, system context, generation process, persona-to-agent activation, experiment lifecycle, and deployment are in the [v2 architecture report](docs/societytwin-v2-architecture.md).
+Related attributes, such as age, education, and employment, are generated together so that they stay consistent with published TÜİK tables. The population is validated against official statistics before it is used.
 
-## Proposed MVP: one complete vertical slice
+SocietyTwin is inspired by architectural ideas from large-scale synthetic-persona systems such as MatrAIx, but it is a separate Türkiye-specific academic project.
 
-`official Türkiye data → synthetic population → validation → cohort → personas → small controlled AI experiment → results → dashboard`
+## Population Records, Personas and AI Agents
 
-- TÜİK ingestion and harmonisation for the core attributes (province, sex, age, marital status, education, labour status), plus target attributes where data is confirmed.
-- Dependency-aware generation (conditional sampling with iterative proportional fitting and hard constraints), benchmarked at 10K and 100K, with 1M as the PROPOSED target benchmark.
-- Validation against source tables and held-out tables, with an independent-sampling ablation.
-- Cohort sampling, template-based persona cards, and a small SURVEY (and, time permitting, SCENARIO) experiment with a stub model and then a budget-bound AI pilot.
-- Subgroup comparison, export, reproducibility, and a basic web playground.
+| Level | What it is | Uses an LLM? |
+|---|---|---|
+| **Population record** | A lightweight synthetic record of a fictional resident of Türkiye (for example province, sex, age, education, employment status) | No |
+| **Persona** | A richer description constructed from a sampled record | No |
+| **Active AI agent** | A selected persona temporarily connected to an LLM for one experiment | Yes |
 
-Stretch goals, future work, and the roadmap: [report §29–33](docs/societytwin-v2-architecture.md#29-mvp).
+Population size is not the same as the number of LLM agents. A population can contain 100,000 or more records, but each experiment turns only a small, budget-limited sample into AI agents.
 
-## Technology (PROPOSED)
+## Proposed MVP
 
-Python 3.12 · NumPy · pandas · PyArrow / Parquet · DuckDB · PostgreSQL · FastAPI · Pydantic · provider-independent LLM adapter · Next.js + TypeScript · Recharts · pytest / Vitest · Docker Compose · GitHub Actions.
+The MVP aims to show one complete path from data to results:
 
-Each choice is justified in [report §6.1](docs/societytwin-v2-architecture.md#61-technology-stack-proposed). Mesa is not part of the MVP core.
+- ingest selected official Türkiye data (TÜİK);
+- generate a synthetic population with dependency-aware generation;
+- build benchmark populations of 10K and 100K records;
+- validate the population statistically against official tables;
+- sample cohorts and construct personas;
+- run a small, controlled AI experiment;
+- analyse results by subgroup;
+- provide a basic dashboard / playground;
+- make every run reproducible (seeds, configurations, versions).
+
+A 1M-record build is an optional scalability benchmark if time allows; the final required population scale is still an open decision. Stretch goals and the roadmap are in the [architecture report](docs/societytwin-v2-architecture.md#29-mvp).
+
+## Technology
+
+Proposed high-level stack:
+
+- Python, FastAPI
+- NumPy, pandas, PyArrow
+- Parquet, DuckDB, PostgreSQL
+- Next.js, TypeScript
+- Provider-independent LLM adapter
+- Docker, GitHub Actions
+
+Details and justifications: [docs/architecture.md](docs/architecture.md).
 
 ## Documentation
 
-| Document | Content |
+| Document | What it covers |
 |---|---|
-| [v2 architecture report](docs/societytwin-v2-architecture.md) | Full design: decisions, diagrams, MVP, roadmap, risks, open decisions |
+| [v2 architecture report](docs/societytwin-v2-architecture.md) | Full design, decisions, MVP, roadmap, open questions |
+| [Architecture reference](docs/architecture.md) | Modules, interfaces, technology |
 | [Project overview](docs/project-overview.md) | Problem, research questions, scope |
-| [Architecture reference](docs/architecture.md) | Modules, interfaces, target layout |
-| [Persona schema](docs/persona-schema.md) | Attributes, sources, status, dependencies, constraints |
+| [Persona schema](docs/persona-schema.md) | Attributes, data sources, dependencies |
 | [Data strategy](docs/data-strategy.md) | TÜİK and other sources, access, licences |
-| [Validation strategy](docs/validation-strategy.md) | Five validation levels and metrics |
-| [Experiment system](docs/experiment-system.md) | Playground flow, environments, telemetry |
-| [Ethics and limitations](docs/ethics-and-limitations.md) | Privacy, bias, misuse, limits |
+| [Validation strategy](docs/validation-strategy.md) | How the population and experiments are validated |
+| [Experiment system](docs/experiment-system.md) | Playground workflow and experiment types |
+| [Ethics and limitations](docs/ethics-and-limitations.md) | Privacy, bias, and limits |
 | [Methodology](docs/methodology.md) | Research methodology |
-| [Sources](docs/sources.md) | Literature, reference systems, data sources, source audit |
-| [Migration plan](docs/migration-plan.md) | v1 → v2 repository changes |
-| [Team responsibilities](docs/team-responsibilities.md) and [research integration](docs/research-integration.md) | Roles and research streams |
-| [Data handling](data/README.md) | Data folders and rules |
-
-**Labels used in the documentation:** CONFIRMED · PROPOSED · OPEN DECISION · FUTURE WORK.
+| [Sources](docs/sources.md) | Literature, reference systems, and data sources |
+| [Migration plan](docs/migration-plan.md) | Changes from the earlier v1 design ([archived](docs/archive/architecture-v1-demographic.md)) |
+| [Team responsibilities](docs/team-responsibilities.md) and [research integration](docs/research-integration.md) | Research roles and how they fit together |
+| [Data handling](data/README.md) | Rules for the data folder |
 
 ## Team
 
-| Team member | Role |
+Current research-phase responsibilities:
+
+| Team member | Responsibility |
 |---|---|
 | Bejan | Project Manager / System Architect |
 | Sam | Literature Research |
@@ -102,12 +100,14 @@ Each choice is justified in [report §6.1](docs/societytwin-v2-architecture.md#6
 | Azra | Existing Systems / Similar Projects |
 | Koray | Data + Population + Simulation Research |
 
-Ownership of the new v2 modules has not been assigned yet (OPEN DECISION).
+Ownership of SocietyTwin v2 implementation modules has not yet been assigned.
 
-## Data and privacy
+## Data, Privacy and Limitations
 
+- The MVP is designed to use official aggregate statistics, primarily from TÜİK, as its main data foundation. No real-person records or personally identifiable information are used.
+- Synthetic personas are fictional and identified by codes, not names. SocietyTwin does not reconstruct or represent real Turkish citizens.
+- SocietyTwin is for population-level research only; its results are not guaranteed predictions of real human behaviour.
+- The sensitive categories defined in Türkiye's data protection law (KVKK Article 6), such as ethnic origin, religion, political opinion, and health, are excluded from the persona schema.
 - No dataset, generated population, or experiment result is committed to this repository.
-- Only official aggregate statistics are used.
-- Special categories of personal data under KVKK Article 6 (such as ethnic origin, religion, political opinion, and health) are excluded, and personas have codes, not names.
 
-See [data/README.md](data/README.md) and [ethics and limitations](docs/ethics-and-limitations.md).
+More detail: [ethics and limitations](docs/ethics-and-limitations.md) and [data/README.md](data/README.md).
