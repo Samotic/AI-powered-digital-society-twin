@@ -36,7 +36,7 @@ flowchart TD
 | Sam: Academic Foundations | What does the research literature say about digital twins, social simulation, synthetic populations, and agents? | Reviewed sources ([sources.md](sources.md)) | Theoretical basis for the system definition; references for the presentation and TÜBİTAK proposal |
 | Azra: Existing Systems / Gaps | What systems already exist, and what can they not do? | Comparison of existing systems | The gap SocietyTwin addresses and its stated contribution |
 | Pakhlavon: Technical Architecture | How could SocietyTwin be built, and why does it need each technology? | Justified technology assessment | Technical side of the architecture; tools listed in `requirements.txt` |
-| Koray: Population / Agents / Simulation | How will the population, agents, simulation, and evaluation work? | Population Schema + Agent Schema + Simulation Concept | Agent / Society Model, Scenario Manager, Simulation Engine, and Evaluation stages of the architecture |
+| Koray: Population / Agents / Simulation | How will the population, agents, simulation, and evaluation work? | Population Schema + Agent Schema + Simulation Concept | In v2: the [persona schema](persona-schema.md), the dependency model, and the [validation strategy](validation-strategy.md) |
 
 ## Integrated outputs
 
@@ -45,8 +45,8 @@ The Project Manager / System Architect combines the research outputs into:
 | Output | Main inputs |
 |---|---|
 | Final system definition (objective, target users, problem, boundaries, capabilities) | All streams |
-| Architecture ([architecture.md](architecture.md), currently preliminary) | Pakhlavon, Koray |
-| Scope ([project-overview.md](project-overview.md#in-scope)) | All streams, especially Azra's gap analysis |
+| Architecture ([v2 architecture report](societytwin-v2-architecture.md), PROPOSED) | Pakhlavon, Koray |
+| Scope ([project-overview.md](project-overview.md#scope)) | All streams, especially Azra's gap analysis |
 | Presentation | All streams; at least 5 sources selected from Sam's list |
 | TÜBİTAK proposal | All streams, especially Sam's sources and Azra's gap and contribution |
 
@@ -66,4 +66,14 @@ This argument has not been written yet. It depends on the research outputs above
 
 ## Status
 
-All research streams are in the research phase. This document describes how the outputs will be combined; it does not record any research findings.
+New instructor feedback (Türkiye only, a substantially larger scalable population, MatrAIx-inspired persona capabilities) led to the PROPOSED [SocietyTwin v2 architecture](societytwin-v2-architecture.md). The existing research responsibilities remain valid and map onto v2 topics as follows. This mapping describes research questions, **not** implementation ownership, which is an **OPEN DECISION**.
+
+| Research stream | Relevant v2 topics |
+|---|---|
+| Sam: Academic Foundations | Population synthesis, persona-conditioned LLM agents, validation literature ([sources.md](sources.md)) |
+| Azra: Existing Systems / Gaps | Reference systems such as MatrAIx, Social Simulation Arena, AgentSociety, and country-scale synthetic populations ([report §7](societytwin-v2-architecture.md#7-reference-systems)) |
+| Pakhlavon: Technical Architecture | Technology stack and scalability ([report §6.1 and §12](societytwin-v2-architecture.md#61-technology-stack-proposed)) |
+| Koray: Population / Agents / Simulation | Persona schema, dependency model, TÜİK data, validation |
+| Bejan: System Definition | Scope, MVP, open instructor decisions ([report §29 and §35](societytwin-v2-architecture.md#35-open-instructor-decisions)) |
+
+This document describes how the research streams feed the design. It does not record individual research findings.

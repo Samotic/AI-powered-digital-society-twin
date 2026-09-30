@@ -2,6 +2,8 @@
 
 This document records the team's current task allocation, as set out in the Project Management document. Update it whenever roles or responsibilities change.
 
+> **v2 note.** The project direction changed after new instructor feedback (see the [v2 architecture report](societytwin-v2-architecture.md)). The roles below are unchanged. **Ownership of the new v2 modules** (for example the generator, sampling, experiments, and AI-agent runtime) **has not been assigned** and is an OPEN DECISION for the team.
+
 How the five research streams come together is described in [research-integration.md](research-integration.md).
 
 ## Summary
@@ -58,7 +60,7 @@ How the five research streams come together is described in [research-integratio
 
 **Expected deliverable:** Approximately 8–10 strong academic or technical sources, each recorded with Paper Title, Year, Problem, Method, Data, Model / Architecture, Results, Limitations, and Relevance to SocietyTwin. The team will select at least 5 of the strongest for the presentation.
 
-**Related document:** [sources.md](sources.md), which currently contains 5 verified core sources and a list of further research targets.
+**Related document:** [sources.md](sources.md), which contains verified sources grouped as core methodology, reference systems, data sources, and future-research sources, plus further research targets.
 
 ## Pakhlavon
 
@@ -137,7 +139,7 @@ Our Contribution
 - Preferences
 - Behavior
 
-> These are research categories only. The instructor's future dataset is **not** assumed to contain all of these variables. The actual population schema will depend on the variables available in the dataset.
+> These are research categories only. The v2 persona schema includes only attributes with a defensible official source (mainly TÜİK) or a documented assumption; see [persona-schema.md](persona-schema.md). Relationships, preferences, and behaviour are not part of the MVP schema.
 
 **Agent research:** agent attributes, agent states, agent behavior, agent interactions, social networks, and the environment.
 

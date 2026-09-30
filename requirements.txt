@@ -1,11 +1,21 @@
 # SocietyTwin: Python dependencies
 #
-# The project is in the research and repository-setup phase, so no Python
-# packages are required yet.
+# No code has been written yet, so no packages are installed or pinned here.
 #
-# Dependencies will be added here, with pinned versions, once the
-# implementation phase begins and the team has agreed on the tools.
-# Candidates under consideration (not yet adopted):
-#   - numpy and pandas for data processing
-#   - pytest for automated tests
-#   - an agent-based modeling framework such as Mesa, or a custom engine
+# Target Python version: 3.12 (3.11 minimum), per the PROPOSED v2 architecture
+# (docs/societytwin-v2-architecture.md, section 6.1). Dependencies will be
+# declared with pinned versions in pyproject.toml when implementation starts.
+#
+# PROPOSED v2 Python stack:
+#   - numpy                      vectorised population generation
+#   - pandas                     reading and harmonising official tables
+#   - pyarrow                    Parquet storage of population builds and results
+#   - duckdb                     in-process queries on Parquet (cohorts, analysis)
+#   - scipy                      distribution metrics (selectively)
+#   - pydantic                   schemas, configurations, structured LLM outputs
+#   - fastapi                    API layer
+#   - a PostgreSQL driver        registry and job queue (SQLite for local tests)
+#   - LLM provider SDK(s)        behind a provider-independent adapter (provider: OPEN DECISION)
+#   - pytest, hypothesis         tests
+#
+# Not part of the MVP core: mesa (optional, small interaction experiments only).

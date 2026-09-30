@@ -1,174 +1,98 @@
-# SocietyTwin — AI-Powered Digital Society Twin
+# SocietyTwin — AI-Powered Digital Society Twin for Türkiye
 
-**Engineering Design II · University project**
+**Engineering Design II · University research project**
 
-> **Current status:** Research, requirements analysis, and initial repository setup.
-> No simulation features have been implemented yet.
+> **Status:** v2 architecture **PROPOSED**. The overall direction is approved for refinement; specific decisions await instructor and team approval. The repository contains documentation and placeholder folders only; implementation has not started.
 
-> **SocietyTwin is intended for population-level research and simulation, not individual-level prediction.**
+SocietyTwin is being designed as a **Türkiye-only, data-grounded synthetic society platform**. It will:
 
-## Contents
+1. generate a synthetic population of Türkiye, at configurable scale, from **official aggregate statistics** (primarily TÜİK);
+2. **validate** that the population reproduces the published Turkish distributions and the relationships between attributes;
+3. **sample cohorts**, construct personas, and turn a small number of them into **AI agents** for reproducible survey and scenario experiments;
+4. analyse results **by subgroup**, with uncertainty and limitations stated.
 
-1. [Overview](#overview)
-2. [Objective](#objective)
-3. [Problem](#problem)
-4. [Planned architecture](#planned-architecture)
-5. [Current status](#current-status)
-6. [Project scope](#project-scope)
-7. [Repository structure](#repository-structure)
-8. [Research areas](#research-areas)
-9. [Team responsibilities](#team-responsibilities)
-10. [Academic / ethical boundary](#academic--ethical-boundary)
-11. [Documentation links](#documentation-links)
+> **SocietyTwin is for population-level research, exploration, and hypothesis generation.** Its personas are synthetic. They do not represent real Turkish citizens, and its results are not predictions of real behaviour.
 
-## Overview
+## Why Türkiye
 
-SocietyTwin is a planned computational social simulation, or *digital society twin*. It will build a synthetic population from aggregate statistical data, represent people and households as computational agents, and use agent-based simulation to study how population-level patterns emerge under controlled scenarios.
+- **Instructor requirement (CONFIRMED):** SocietyTwin focuses only on Türkiye.
+- **Official data:** TÜİK publishes register-based population statistics (ADNKS) every year, down to district level. The 2025 resident population was **86,092,168**. TÜİK also publishes survey statistics on education, labour, households, and ICT use at national and regional levels.
+- **Turkish structure:** every synthetic record belongs to one of Türkiye's 81 provinces (İBBS NUTS-3), with its NUTS-2 and NUTS-1 regions. Attributes use TÜİK's official categories, so synthetic results can be compared directly with Turkish statistics.
 
-The project aims to:
+## Why v2
 
-- construct synthetic populations from aggregate statistical data;
-- represent people and households as computational agents;
-- simulate controlled socioeconomic or demographic scenarios;
-- analyze population-level emergent behavior;
-- compare simulation results with known aggregate or historical data;
-- evaluate and validate the model.
+The instructor confirmed three things:
+- SocietyTwin must focus **only on Türkiye**.
+- **5,000 synthetic agents is too small.** The system should support a **substantially larger, scalable** population.
+- **Large-scale synthetic-persona systems such as MatrAIx** are an important inspiration.
 
-## Objective
+SocietyTwin is **inspired by architectural ideas from large-scale synthetic persona systems such as MatrAIx**. It is its own Türkiye-specific academic project, not a clone ([report §7](docs/societytwin-v2-architecture.md#7-reference-systems)). The earlier 5,000-agent demographic design is superseded and [archived](docs/archive/architecture-v1-demographic.md).
 
-SocietyTwin's objective is to build a reproducible, validated agent-based simulation of a synthetic population that can be used to study how controlled changes affect population-level outcomes.
+## Core idea: records, personas, and agents
 
-The planned objectives are to:
+| Level | What it is | Scale | Uses an LLM? |
+|---|---|---|---|
+| **Population record** | A lightweight, statistically generated fictional member of Türkiye's population | Configurable builds; benchmark scales 10K, 100K, 1M+ | Never |
+| **Persona** | A richer view of a sampled record: descriptors, provenance, persona card | Per cohort, on demand | No (template-based) |
+| **Active AI agent** | A persona temporarily instantiated with an LLM for one experiment trial | Small, budget-bound pilots | Yes |
 
-1. **Understand the data.** Document the structure, variables, coverage, and limitations of the instructor-provided dataset.
-2. **Generate a synthetic population.** Create synthetic agents and households whose aggregate distributions match the source statistics within documented tolerances.
-3. **Model agent behavior.** Define transparent, documented behavioral rules for agents and households.
-4. **Establish a baseline.** Build a baseline society that represents the population without any scenario intervention.
-5. **Run controlled scenarios.** Change one or more conditions relative to the baseline and measure the aggregate effect.
-6. **Ensure reproducibility.** Make every experiment repeatable from a recorded configuration and random seed.
-7. **Validate the model.** Compare the synthetic population and simulation outputs with reference or historical aggregate data, and report limitations clearly.
+**Population size and the number of AI agents are independent.** LLM calls grow with the experiment cohort, not with the population. The final target population size will be set from instructor requirements, available data, and benchmarks (OPEN DECISION). 1M is PROPOSED as the largest MVP benchmark ([report §12](docs/societytwin-v2-architecture.md#12-scalability-strategy)).
 
-The final system definition, including target users and system boundaries, is being prepared by the Project Manager / System Architect (see [team responsibilities](docs/team-responsibilities.md)).
-
-## Problem
-
-Real societies are complex systems: the choices and circumstances of individuals and households combine to produce patterns that can only be seen at the population level. These patterns are difficult to study directly. Real-world experiments on a population are usually impractical or unethical, and aggregate statistics alone do not show how individual-level mechanisms produce them. SocietyTwin aims to study such patterns in a controlled, reproducible computational environment.
-
-The input data will be aggregate statistics provided by the course instructor at a later stage. **The actual population schema will depend on the variables available in that dataset.** Possible examples include age, gender, education, employment status, income, household structure, occupation, or geographic area, but none of these is assumed until the dataset has been received and reviewed.
-
-## Planned architecture
-
-> **Preliminary.** This architecture is not final and will change as research progresses.
+## Pipeline (simplified)
 
 ```mermaid
-flowchart TD
-    A["Instructor / Aggregate Data"]
-    B["Data Processing"]
-    C["Synthetic Population Generator"]
-    D["Agent / Society Model"]
-    E["Scenario Manager"]
-    F["Simulation Engine"]
-    G["Evaluation / Historical Validation"]
-    H["Population-Level Results"]
-
-    A --> B
-    B --> C
-    C --> D
-    D --> E
-    E --> F
-    F --> G
-    G --> H
-    A -.->|reference / historical statistics| G
+flowchart LR
+    A["TÜİK aggregate data"] --> B["Ingestion and harmonisation"]
+    B --> C["Dependency-aware generator"]
+    C --> D[("Synthetic population<br/>configurable size")]
+    D --> E["Cohort sampling<br/>and personas"]
+    E --> F["AI persona agents<br/>SURVEY or SCENARIO"]
+    F --> G["Subgroup analysis"]
+    G --> H["Validation"]
+    H --> I["Playground"]
 ```
 
-Each stage and its planned module is described in [docs/architecture.md](docs/architecture.md).
+The full data flow, system context, generation process, persona-to-agent activation, experiment lifecycle, and deployment are in the [v2 architecture report](docs/societytwin-v2-architecture.md).
 
-### Technology (under research)
+## Proposed MVP: one complete vertical slice
 
-Technologies have not been selected. Pakhlavon (Technical Architecture / Technologies) is evaluating them, and every technology must answer the question *"Why does SocietyTwin actually need this technology?"* before it is adopted. The candidates below were noted during repository setup and are not decisions.
+`official Türkiye data → synthetic population → validation → cohort → personas → small controlled AI experiment → results → dashboard`
 
-| Area | Candidate |
+- TÜİK ingestion and harmonisation for the core attributes (province, sex, age, marital status, education, labour status), plus target attributes where data is confirmed.
+- Dependency-aware generation (conditional sampling with iterative proportional fitting and hard constraints), benchmarked at 10K and 100K, with 1M as the PROPOSED target benchmark.
+- Validation against source tables and held-out tables, with an independent-sampling ablation.
+- Cohort sampling, template-based persona cards, and a small SURVEY (and, time permitting, SCENARIO) experiment with a stub model and then a budget-bound AI pilot.
+- Subgroup comparison, export, reproducibility, and a basic web playground.
+
+Stretch goals, future work, and the roadmap: [report §29–33](docs/societytwin-v2-architecture.md#29-mvp).
+
+## Technology (PROPOSED)
+
+Python 3.12 · NumPy · pandas · PyArrow / Parquet · DuckDB · PostgreSQL · FastAPI · Pydantic · provider-independent LLM adapter · Next.js + TypeScript · Recharts · pytest / Vitest · Docker Compose · GitHub Actions.
+
+Each choice is justified in [report §6.1](docs/societytwin-v2-architecture.md#61-technology-stack-proposed). Mesa is not part of the MVP core.
+
+## Documentation
+
+| Document | Content |
 |---|---|
-| Programming language | Python 3 |
-| Data processing | NumPy, pandas |
-| Agent-based simulation | A custom engine, or an existing framework such as Mesa |
-| Testing | pytest |
-| Documentation | Markdown, with Mermaid diagrams rendered by GitHub |
-| Version control | Git and GitHub |
+| [v2 architecture report](docs/societytwin-v2-architecture.md) | Full design: decisions, diagrams, MVP, roadmap, risks, open decisions |
+| [Project overview](docs/project-overview.md) | Problem, research questions, scope |
+| [Architecture reference](docs/architecture.md) | Modules, interfaces, target layout |
+| [Persona schema](docs/persona-schema.md) | Attributes, sources, status, dependencies, constraints |
+| [Data strategy](docs/data-strategy.md) | TÜİK and other sources, access, licences |
+| [Validation strategy](docs/validation-strategy.md) | Five validation levels and metrics |
+| [Experiment system](docs/experiment-system.md) | Playground flow, environments, telemetry |
+| [Ethics and limitations](docs/ethics-and-limitations.md) | Privacy, bias, misuse, limits |
+| [Methodology](docs/methodology.md) | Research methodology |
+| [Sources](docs/sources.md) | Literature, reference systems, data sources, source audit |
+| [Migration plan](docs/migration-plan.md) | v1 → v2 repository changes |
+| [Team responsibilities](docs/team-responsibilities.md) and [research integration](docs/research-integration.md) | Roles and research streams |
+| [Data handling](data/README.md) | Data folders and rules |
 
-The core model is planned as a rule-based agent-based simulation. Research on LLM-driven agents is used as conceptual inspiration only (see [docs/sources.md](docs/sources.md)); it is not a requirement for SocietyTwin agents.
+**Labels used in the documentation:** CONFIRMED · PROPOSED · OPEN DECISION · FUTURE WORK.
 
-## Current status
-
-**Phase:** Research, requirements analysis, and initial repository setup.
-
-| Work item | Status |
-|---|---|
-| System definition and scope (Bejan) | Assigned; research phase |
-| Literature research (Sam) | Assigned; 5 verified core sources recorded |
-| Technical architecture research (Pakhlavon) | Assigned; research phase |
-| Existing systems research (Azra) | Assigned; research phase |
-| Data, population, and simulation research (Koray) | Assigned; research phase |
-| Repository structure and documentation | Initial version complete |
-| Architecture | Preliminary; not final |
-| Instructor dataset | Awaiting delivery |
-| Implementation (all modules) | Not started |
-
-No code, datasets, or simulation results exist in this repository yet.
-
-## Project scope
-
-The scope is deliberately limited, because a "digital society twin" can easily grow unrealistically large. The full lists are in [docs/project-overview.md](docs/project-overview.md#in-scope).
-
-**In scope (planned capabilities):** processing instructor-provided aggregate data, synthetic population generation, population-level agent representation, agent-based social/economic simulation, controlled scenario definition and execution, aggregate result analysis, statistical similarity analysis, historical/empirical validation where suitable data exists, model comparison, reproducible experiments, and population-level visualization of results.
-
-**Out of scope:** predicting the behavior of specific real individuals, individual surveillance, identifying real people, reconstructing identifiable individuals, real-time surveillance systems, claiming perfect prediction of society, automatically making government or political decisions, treating simulation results as guaranteed real-world outcomes, building an unlimited or full digital replica of society, and using private or personally identifiable data without authorization.
-
-## Repository structure
-
-```text
-AI-powered-digital-society-twin/
-├── README.md                    Project overview (this file)
-├── .gitignore                   Keeps datasets, secrets and generated files out of Git
-├── requirements.txt             Python dependencies (none required yet)
-├── data/                        Data folders; no datasets are committed
-│   ├── README.md                Data handling rules
-│   ├── raw/                     Original instructor-provided data (git-ignored)
-│   └── processed/               Cleaned and transformed data (git-ignored)
-├── src/                         Source code (planned modules; none implemented)
-│   ├── data_processing/         Data Processing
-│   ├── population/              Synthetic Population Generator
-│   ├── agents/                  Agent / Society Model
-│   ├── scenarios/               Scenario Manager
-│   ├── simulation/              Simulation Engine
-│   ├── validation/              Evaluation / Historical Validation
-│   └── analysis/                Population-Level Results
-├── docs/                        Project documentation
-│   ├── project-overview.md      Problem, approach, scope
-│   ├── architecture.md          Preliminary architecture
-│   ├── methodology.md           Planned methodology
-│   ├── sources.md               Literature research
-│   ├── team-responsibilities.md Team roles and deliverables
-│   └── research-integration.md  How the research streams combine
-├── experiments/                 Reproducible scenario configurations and outputs
-└── tests/                       Automated tests (added with the implementation)
-```
-
-## Research areas
-
-The project is in its research phase. Each research stream has a named owner and an expected deliverable:
-
-| Research stream | Owner | Focus | Expected deliverable |
-|---|---|---|---|
-| System definition and integration | Bejan | Objective, users, problem, boundaries, capabilities, architecture, scope | Integrated SocietyTwin design |
-| Academic foundations | Sam | Digital twins, social simulation, agent-based modeling, synthetic populations, generative and LLM-based agents | 8–10 reviewed sources ([sources.md](docs/sources.md)) |
-| Technical architecture | Pakhlavon | Languages, frameworks, data, backend, frontend, testing, GitHub workflow | Justified technology assessment |
-| Existing systems | Azra | Social and socio-technical digital twins, synthetic population systems, agent-based society simulations | Existing work → gap → contribution |
-| Population, agents, and simulation | Koray | Population representation, agent design, simulation concept, evaluation | Population Schema + Agent Schema + Simulation Concept |
-
-How these streams come together is described in [docs/research-integration.md](docs/research-integration.md). The planned research methodology is in [docs/methodology.md](docs/methodology.md).
-
-## Team responsibilities
+## Team
 
 | Team member | Role |
 |---|---|
@@ -178,34 +102,12 @@ How these streams come together is described in [docs/research-integration.md](d
 | Azra | Existing Systems / Similar Projects |
 | Koray | Data + Population + Simulation Research |
 
-Full responsibilities and deliverables: [docs/team-responsibilities.md](docs/team-responsibilities.md)
+Ownership of the new v2 modules has not been assigned yet (OPEN DECISION).
 
-- **Course:** Engineering Design II
-- **Instructor:** *To be added*
-- **Institution:** *To be added*
+## Data and privacy
 
-## Academic / ethical boundary
+- No dataset, generated population, or experiment result is committed to this repository.
+- Only official aggregate statistics are used.
+- Special categories of personal data under KVKK Article 6 (such as ethnic origin, religion, political opinion, and health) are excluded, and personas have codes, not names.
 
-SocietyTwin is a university engineering project developed for educational and research purposes.
-
-- **SocietyTwin is intended for population-level research and simulation, not individual-level prediction.**
-- Synthetic agents are statistical constructs. They do not represent, identify, or reconstruct real people.
-- Any results the model produces will be simulated outputs based on stated assumptions. They are not forecasts, are not guaranteed real-world outcomes, and must not be used to make decisions about specific individuals or to make government or political decisions automatically.
-- This repository does not contain any dataset. Instructor-provided data will be used only under the terms on which it is supplied, and sensitive, private, or restricted data will not be committed to GitHub (see [data/README.md](data/README.md)).
-- Published research that informs the project is credited in [docs/sources.md](docs/sources.md).
-
-## Documentation links
-
-**Project documents**
-
-- [Project overview](docs/project-overview.md): problem, approach, in scope and out of scope
-- [Architecture](docs/architecture.md): preliminary conceptual pipeline
-- [Methodology](docs/methodology.md): planned research methodology
-- [Research sources](docs/sources.md): literature research
-- [Team responsibilities](docs/team-responsibilities.md): roles and deliverables
-- [Research integration](docs/research-integration.md): how the research streams combine
-- [Data handling](data/README.md): data folders and privacy rules
-
-**Planned modules**
-
-[data_processing](src/data_processing/README.md) · [population](src/population/README.md) · [agents](src/agents/README.md) · [scenarios](src/scenarios/README.md) · [simulation](src/simulation/README.md) · [validation](src/validation/README.md) · [analysis](src/analysis/README.md) · [experiments](experiments/README.md) · [tests](tests/README.md)
+See [data/README.md](data/README.md) and [ethics and limitations](docs/ethics-and-limitations.md).

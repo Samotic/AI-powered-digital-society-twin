@@ -1,21 +1,5 @@
-# `simulation`: Simulation Engine
+# `simulation` (placeholder)
 
-**Status:** Planned. Not implemented yet.
+**Status:** Placeholder from the research phase. Not implemented.
 
-## Purpose
-
-This module will implement the **Simulation Engine** stage of the [preliminary architecture](../../docs/architecture.md). It will advance the society model through time and execute the baseline and scenarios defined by the Scenario Manager (`src/scenarios/`).
-
-## Planned responsibilities
-
-- Run the **baseline society**: the population evolving under the agent rules with no scenario intervention.
-- Run **scenarios**: the same population and random seed, with one or more conditions changed according to a scenario definition from the Scenario Manager.
-- Keep random draws aligned between the baseline and each scenario, so that differences in outcomes can be attributed to the scenario change.
-- Collect aggregate outputs (for example, rates, averages, and distributions) at each timestep.
-
-## Inputs and outputs
-
-- **Input:** the society model from the `agents` module and validated scenario definitions from the `scenarios` module
-- **Output:** aggregate time series for the baseline and each scenario, passed to Evaluation / Historical Validation (`validation` and `analysis` modules)
-
-The time step, simulation length, and scenario parameters will be defined during the design phase.
+In the PROPOSED v2 architecture, **`src/societytwin/simulation/`** is **optional (STRETCH)**: vectorised population dynamics (aging, births, deaths, migration) and the Cohort-Component / Matrix Projection benchmark carried over from v1. The core of v2 is population generation and AI-persona experiments, not this engine. See the [module specification](../../docs/architecture.md#simulation-optional-stretch) and [report §17](../../docs/societytwin-v2-architecture.md#17-abm--cohort--ml-integration-decision).

@@ -1,14 +1,18 @@
 # ------------------------------------------------------------------
-# Data: never commit datasets
+# Data: never commit datasets or generated outputs
 # ------------------------------------------------------------------
-# Everything inside data/raw and data/processed is ignored by default.
-# Only the folder placeholders and README files stay tracked.
+# Everything inside these folders is ignored by default: downloaded data,
+# harmonised tables, generated population builds, and experiment results.
+# Only folder placeholders and README files stay tracked.
 data/raw/*
 data/processed/*
-!data/raw/.gitkeep
-!data/processed/.gitkeep
-!data/raw/README.md
-!data/processed/README.md
+data/populations/*
+data/results/*
+!data/*/.gitkeep
+!data/*/README.md
+
+# data/manifest.yaml (dataset metadata, no data) is intentionally tracked.
+!data/manifest.yaml
 
 # Extra safety: common dataset formats anywhere under data/
 data/**/*.csv
@@ -17,8 +21,10 @@ data/**/*.txt
 data/**/*.xlsx
 data/**/*.xls
 data/**/*.json
+data/**/*.jsonl
 data/**/*.parquet
 data/**/*.feather
+data/**/*.arrow
 data/**/*.pkl
 data/**/*.sav
 data/**/*.dta
@@ -28,14 +34,36 @@ data/**/*.sqlite
 data/**/*.zip
 data/**/*.gz
 
-# Generated experiment outputs (configurations stay tracked)
+# Experiment outputs (instruments and configurations stay tracked)
 experiments/outputs/
+experiments/results/
+
+# Databases created by the registry or local analytics
+*.db
+*.sqlite
+*.sqlite3
+*.duckdb
+*.duckdb.wal
+
+# Logs
+logs/
+*.log
+
+# LLM / model-provider response caches (may contain generated text)
+.cache/
+llm_cache/
+.llm_cache/
+/cache/
+
+# Small, clearly artificial test fixtures ARE tracked:
+# keep them in tests/fixtures/, never under data/.
 
 # ------------------------------------------------------------------
 # Secrets and credentials: never commit
 # ------------------------------------------------------------------
 .env
 .env.*
+!.env.example
 *.pem
 *.key
 secrets/
@@ -53,11 +81,22 @@ env/
 .pytest_cache/
 .mypy_cache/
 .ruff_cache/
+.hypothesis/
 .coverage
 htmlcov/
 .ipynb_checkpoints/
 build/
 dist/
+
+# ------------------------------------------------------------------
+# Node / Next.js (planned frontend)
+# ------------------------------------------------------------------
+node_modules/
+.next/
+out/
+coverage/
+*.tsbuildinfo
+next-env.d.ts
 
 # ------------------------------------------------------------------
 # Operating system and editors

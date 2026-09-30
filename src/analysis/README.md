@@ -1,19 +1,5 @@
-# `analysis`: aggregate statistics and population-level results
+# `analysis` (placeholder)
 
-**Status:** Planned. Not implemented yet.
+**Status:** Placeholder from the research phase. Not implemented.
 
-## Purpose
-
-This module will summarize simulation outputs at the population level and compare scenarios with the baseline. It supplies statistics to Evaluation / Historical Validation and produces the **Population-Level Results** stage of the [preliminary architecture](../../docs/architecture.md). Results will be reported together with their evaluation status.
-
-## Planned responsibilities
-
-- Compute aggregate statistics from simulation outputs (for example, rates, means, distributions, and breakdowns by group).
-- Compare each scenario with the baseline and report the differences.
-- Summarize variation across repeated runs with different random seeds.
-- Produce tables and charts for reports.
-
-## Inputs and outputs
-
-- **Input:** aggregate results from the `simulation` module
-- **Output:** summary tables, comparisons, and figures for documentation and for the `validation` module
+In the PROPOSED v2 architecture this is merged into **`src/societytwin/evaluation/`**: weighted subgroup analysis and the Common Result Schema. See the [module specification](../../docs/architecture.md#evaluation) and the [migration plan](../../docs/migration-plan.md).

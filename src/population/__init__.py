@@ -1,1 +1,1 @@
-"""Synthetic population generation (planned; not implemented yet)."""
+"""Placeholder from the research phase; see docs/migration-plan.md for its v2 target (not implemented)."""
