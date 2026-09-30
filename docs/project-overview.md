@@ -11,9 +11,15 @@
 
 - SocietyTwin focuses **only on Türkiye**.
 - **5,000 synthetic agents is too small.** The population must be substantially larger, and the architecture must scale.
-- SocietyTwin should have capabilities **inspired by large-scale synthetic-persona / AI-society systems**, with MatrAIx / Persona-8B as the main reference. SocietyTwin is not a clone of MatrAIx.
+- Large-scale synthetic-persona systems such as MatrAIx / Persona-8B are an important inspiration. SocietyTwin is inspired by their architectural ideas but is its own Türkiye-specific academic project, not a clone.
 
-The exact population size is not specified by the instructor (**OPEN DECISION**).
+The instructor has not specified a population size. Builds are configurable; 10K, 100K, and 1M are **benchmark scales**, 1M is PROPOSED as the largest MVP benchmark, and the final target size is an **OPEN DECISION** ([report §12](societytwin-v2-architecture.md#12-scalability-strategy)).
+
+## Why Türkiye
+
+- The instructor requires SocietyTwin to focus only on Türkiye (CONFIRMED).
+- TÜİK publishes register-based population statistics (ADNKS) annually, down to district level (2025 resident population: 86,092,168), and survey statistics on education, labour, households, and ICT use at national and regional levels. Every synthetic record can be anchored to these statistics.
+- Records are organised by Türkiye's statistical geography: 81 provinces (İBBS NUTS-3), 26 NUTS-2 regions, and 12 NUTS-1 regions. Validation compares synthetic distributions with TÜİK tables at the same levels ([report §8](societytwin-v2-architecture.md#8-türkiye-data-strategy)).
 
 ## Problem
 
@@ -23,14 +29,14 @@ SocietyTwin addresses a narrower, testable problem: **generate a synthetic popul
 
 ## Research questions (PROPOSED)
 
-**Primary.** To what extent can a synthetic population of Türkiye generated only from official aggregate statistics reproduce the source distributions and their published cross-tabulations as its size grows, and under what conditions do AI agents instantiated from its personas respond consistently with their persona attributes and comparably to held-out Turkish survey aggregates?
+**Primary.** To what extent can a synthetic population of Türkiye, generated at configurable scale solely from official aggregate statistics, reproduce the distributions and attribute dependencies published by TÜİK, and how consistently and reproducibly can personas constructed from it be used in controlled AI-enabled experiments?
 
 **Secondary.**
 
-1. How much does dependency-aware generation reduce error on held-out cross-tabulations compared with independent-attribute sampling, and how does fidelity change from 10K to 1M records, particularly for small provinces?
-2. What are the runtime, memory, and storage costs of generating, storing, and querying 10K, 100K, and 1M records on a single machine?
-3. How consistently do LLM agents express their assigned attributes across repeated runs, prompt perturbations, and models?
-4. For survey items with published TÜİK aggregates that were not used in generation, how close are subgroup response distributions of persona agents to the real aggregates, compared with simple baselines?
+1. How much does dependency-aware generation (conditional sampling with IPF-fitted conditionals and hard constraints) reduce error on held-out TÜİK cross-tabulations compared with independent-attribute sampling?
+2. How do statistical fidelity (especially for small provinces) and the costs of generation, storage, querying, and sampling change across the benchmark scales of 10K, 100K, and 1M records?
+3. How consistently do AI agents constructed from population records express their assigned attributes across repeated runs, prompt perturbations, and (budget permitting) different models?
+4. For survey items with published Turkish aggregates that were not used in generation, how close are subgroup response distributions of persona agents to the real aggregates compared with simple baselines, and how exactly can experiments be reproduced?
 
 The previous research question (comparing ABM, Cohort-Component / Matrix Projection, and ML models) is superseded. Whether the TÜBİTAK 2209-B proposal can be revised accordingly is an **OPEN DECISION** ([report §5](societytwin-v2-architecture.md#5-research-questions)).
 
@@ -38,7 +44,7 @@ The previous research question (comparing ABM, Cohort-Component / Matrix Project
 
 1. **Data:** ingest, validate, and harmonise official TÜİK tables ([data-strategy.md](data-strategy.md)).
 2. **Schema:** a small, evidence-backed Türkiye persona schema with provenance for every attribute ([persona-schema.md](persona-schema.md)).
-3. **Generation:** dependency-aware, vectorised generation of population builds of 10K, 100K, and 1M records.
+3. **Generation:** dependency-aware, vectorised generation of population builds of configurable size, benchmarked at 10K, 100K, and 1M records.
 4. **Validation:** statistical representativeness and conditional consistency, including held-out tables ([validation-strategy.md](validation-strategy.md)).
 5. **Cohorts:** reproducible filtering and sampling with weights.
 6. **Experiments:** SURVEY and SCENARIO experiments in which a small number of sampled personas are instantiated as AI agents ([experiment-system.md](experiment-system.md)).
@@ -46,9 +52,9 @@ The previous research question (comparing ABM, Cohort-Component / Matrix Project
 
 ## Scope
 
-**In scope (MVP, PROPOSED):** Türkiye aggregate data ingestion; persona schema; dependency-aware generation up to 1M records; statistical validation; cohort sampling; SURVEY and SCENARIO experiments with bounded AI activation; telemetry; subgroup analysis; reproducibility; a basic web playground.
+**In scope (MVP, PROPOSED):** Türkiye aggregate data ingestion; persona schema; dependency-aware generation at configurable scale (benchmarks at 10K, 100K, and 1M); statistical validation; cohort sampling; SURVEY and SCENARIO experiments with bounded AI activation; telemetry; subgroup analysis; reproducibility; a basic web playground.
 
-**Stretch:** CHAT environment; linked households; income quintile; microdata-based generator; full-scale (about 86.1 million) build; vectorised population dynamics with the Cohort-Component / Matrix Projection benchmark; maps; cross-model audits.
+**Stretch:** CHAT environment; linked households; income quintile; microdata-based generator; builds larger than 1M, up to full scale (about 86.1 million); vectorised population dynamics with the Cohort-Component / Matrix Projection benchmark; maps; cross-model audits.
 
 **Future work:** web and app environments; interacting LLM societies and social networks; survey-grounded dispositions; pre-registered validity tests; economic and policy scenarios.
 

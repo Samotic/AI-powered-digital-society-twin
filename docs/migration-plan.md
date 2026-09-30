@@ -40,7 +40,7 @@ Carried out when implementation starts, after the v2 architecture is approved. T
 
 | v1 requirement | v2 status |
 |---|---|
-| Exactly 5,000 synthetic agents (FR-02, TC-01) | Superseded: builds of configurable size; 10K / 100K / 1M benchmarks; 1M default (PROPOSED) |
+| Exactly 5,000 synthetic agents (FR-02, TC-01) | Superseded: builds of configurable size; 10K / 100K / 1M are benchmark scales (1M PROPOSED as the largest MVP benchmark); final target size OPEN DECISION |
 | 5,000 agents × 10 years within 60 s (NFR-02, TC-10) | Superseded: separate generation, storage, simulation, and AI-activation targets set after benchmarks (OPEN DECISION) |
 | Seven-field demographic agent schema | Superseded by persona schema `tr-persona-1` |
 | ABM + Cohort-Component / Matrix Projection + ML comparison as the core | Moved to supporting, optional, or future roles ([report §17](societytwin-v2-architecture.md#17-abm--cohort--ml-integration-decision)) |

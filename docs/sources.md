@@ -2,23 +2,26 @@
 
 **Owner:** Sam (Literature Research)
 
-This document records the academic, technical, and data sources behind SocietyTwin v2. Sources are grouped as the v2 architecture requires:
+This document records the academic, technical, and data sources behind SocietyTwin v2, grouped as follows:
 
-1. [Core methodology sources](#core-methodology-sources): methods SocietyTwin applies (population synthesis, validation, persona-conditioned LLM agents).
-2. [Reference systems](#reference-systems): existing systems used as inspiration or comparison. SocietyTwin is **not** a clone of any of them.
-3. [Data sources](#data-sources): official statistics, legal texts, and licences.
-4. [Future-research sources](#future-research-sources): relevant to stretch goals or later work.
+1. [Core methodology](#core-methodology): methods applied directly in the MVP pipeline.
+2. [Synthetic population research](#synthetic-population-research): alternative and advanced population-synthesis methods.
+3. [Persona and LLM research](#persona-and-llm-research): LLM agents conditioned on personas, their fidelity and biases.
+4. [Validation research](#validation-research): validating synthetic data, agent-based models, and LLM simulations.
+5. [Reference systems](#reference-systems): existing systems used as inspiration or comparison. SocietyTwin is inspired by architectural ideas from systems such as MatrAIx but is **not** a clone of any of them.
+6. [Türkiye data sources](#türkiye-data-sources): official statistics, legal texts, and licences.
+7. [Future research](#future-research): relevant to stretch goals or later work.
 
 ## How this document is maintained
 
-- Bibliographic details were checked against publishers' pages, Crossref, arXiv, ACL Anthology, official repositories, or official statistics publications. Sources that could not be verified are not listed as citations.
+- Bibliographic details were checked against publishers' pages, Crossref, arXiv, ACL Anthology, PMLR, official repositories, or official statistics publications. Sources that could not be verified are not listed as citations.
 - Descriptions marked **"per the abstract"** or taken from a repository README reflect only those texts. Read the full text before citing specific findings in the presentation or the TÜBİTAK proposal.
 - Fields that cannot be filled from verified material are marked **"TODO: Requires source review."**
 - The five sources reviewed in the research phase keep their full review fields (Problem, Method, Data, Model / Architecture, Results, Limitations). Newer sources use a shorter format: citation, contribution, use in SocietyTwin, and limitations.
 
-## Core methodology sources
+## Core methodology
 
-### A. Synthetic population generation
+Methods applied directly in the MVP generator and its integerisation.
 
 ### Generation of Synthetic Populations in Social Simulations: A Review of Methods and Practices
 
@@ -57,6 +60,17 @@ This document records the academic, technical, and data sources behind SocietyTw
 - **How SocietyTwin uses it:** Background for the MVP generator (synthetic reconstruction from aggregate tables).
 - **Limitations / relevance:** Developed for a different national context. TODO: Requires source review (data requirements of the original method).
 
+### Generating a Two-Layered Synthetic Population for French Municipalities: Results and Evaluation of Four Synthetic Reconstruction Methods
+
+- **Citation:** Yameogo, B. F., Vandanjon, P.-O., Gastineau, P., & Hankach, P. (2021). *JASSS*, 24(2), 5. doi:[10.18564/jasss.4482](https://doi.org/10.18564/jasss.4482)
+- **Contributes:** Per the abstract: compares four synthetic reconstruction methods and two integerisation approaches for households and individuals; hierarchical IPF and relative entropy minimisation performed best with truncate-replicate-sample allocation.
+- **How SocietyTwin uses it:** Guides the choice of integerisation (controlled rounding) and the STRETCH linked-household design.
+- **Limitations / relevance:** French census context; results may not transfer directly to TÜİK tables.
+
+## Synthetic population research
+
+Alternative and advanced population-synthesis methods considered in the architecture (households, microdata-based generators, rare combinations).
+
 ### A methodology to match distributions of both household and person attributes in the generation of synthetic populations
 
 - **Citation:** Ye, X., Konduri, K. C., Pendyala, R. M., Sana, B., & Waddell, P. (2009). Paper presented at the 88th Annual Meeting of the Transportation Research Board, Washington, DC.
@@ -85,14 +99,62 @@ This document records the academic, technical, and data sources behind SocietyTw
 - **How SocietyTwin uses it:** Motivates keeping legitimate rare combinations (soft constraints are not masked) and the rare-cell recall metric.
 - **Limitations / relevance:** Uses deep generative models, which are FUTURE WORK for SocietyTwin.
 
-### Generating a Two-Layered Synthetic Population for French Municipalities: Results and Evaluation of Four Synthetic Reconstruction Methods
+## Persona and LLM research
 
-- **Citation:** Yameogo, B. F., Vandanjon, P.-O., Gastineau, P., & Hankach, P. (2021). *JASSS*, 24(2), 5. doi:[10.18564/jasss.4482](https://doi.org/10.18564/jasss.4482)
-- **Contributes:** Per the abstract: compares four synthetic reconstruction methods and two integerisation approaches for households and individuals; hierarchical IPF and relative entropy minimisation performed best with truncate-replicate-sample allocation.
-- **How SocietyTwin uses it:** Guides the choice of integerisation (controlled rounding) and the STRETCH linked-household design.
-- **Limitations / relevance:** French census context; results may not transfer directly to TÜİK tables.
+Research on LLM agents conditioned on personas, and on their fidelity, bias, and stereotyping.
 
-### B. Validation of synthetic data and simulations
+### Out of One, Many: Using Language Models to Simulate Human Samples
+
+- **Citation:** Argyle, L. P., Busby, E. C., Fulda, N., Gubler, J., Rytting, C., & Wingate, D. (2023). *Political Analysis*. doi:[10.1017/pan.2023.2](https://doi.org/10.1017/pan.2023.2)
+- **Contributes:** Per the abstract: proposes studying language models as proxies for specific human sub-populations, arguing that model biases are not uniform properties of a model.
+- **How SocietyTwin uses it:** Motivates conditioning agents on demographic persona cards and comparing responses by subgroup.
+- **Limitations / relevance:** Evidence comes from another national context; transfer to Türkiye and to Turkish-language prompts is untested.
+
+### Using Large Language Models to Simulate Multiple Humans and Replicate Human Subject Studies
+
+- **Citation:** Aher, G., Arriaga, R. I., & Kalai, A. T. (2023). ICML 2023. arXiv:[2208.10264](https://arxiv.org/abs/2208.10264)
+- **Contributes:** Per the abstract: introduces "Turing Experiments" to test how far a model can simulate aspects of human behaviour, and shows they can reveal consistent distortions.
+- **How SocietyTwin uses it:** Informs the design of replication-style checks and the expectation of systematic distortions.
+- **Limitations / relevance:** Replicates known studies; does not address national population synthesis.
+
+### LLM Agents Grounded in Self-Reports Enable General-Purpose Simulation of Individuals
+
+- **Citation:** Park, J. S., Zou, C. Q., Kamphorst, J., Egan, N., Shaw, A., Hill, B. M., Cai, C., Morris, M. R., Liang, P., Willer, R., & Bernstein, M. S. (2024, revised 2026). arXiv:[2411.10109](https://arxiv.org/abs/2411.10109). Earlier versions were titled "Generative Agent Simulations of 1,000 People".
+- **Contributes:** Per the abstract: agents built from interviews and surveys of 1,052 Americans reached 82–86% of individual test–retest consistency on held-out items, versus 74% for demographic-only baselines.
+- **How SocietyTwin uses it:** SocietyTwin personas are **demographic-only by design** (no real-person data), so this paper sets the expectation that their fidelity is limited and must be measured, and it motivates demographic-only baselines.
+- **Limitations / relevance:** Relies on real interview data, which SocietyTwin does not use; US sample.
+
+### Whose Opinions Do Language Models Reflect?
+
+- **Citation:** Santurkar, S., Durmus, E., Ladhak, F., Lee, C., Liang, P., & Hashimoto, T. (2023). In *Proceedings of the 40th International Conference on Machine Learning* (ICML 2023), PMLR 202, 29971–30004. <https://proceedings.mlr.press/v202/santurkar23a.html>; arXiv:[2303.17548](https://arxiv.org/abs/2303.17548)
+- **Contributes:** Per the abstract: a quantitative framework for measuring which opinions LMs reflect, using public opinion polls and their human responses.
+- **How SocietyTwin uses it:** Informs distribution-comparison metrics (for example Jensen–Shannon divergence) and awareness of model opinion bias.
+- **Limitations / relevance:** US opinion polls.
+
+### Towards Measuring the Representation of Subjective Global Opinions in Language Models
+
+- **Citation:** Durmus, E., Nguyen, K., Liao, T. I., Schiefer, N., Askell, A., Bakhtin, A., Chen, C., Hatfield-Dodds, Z., Hernandez, D., Joseph, N., Lovitt, L., McCandlish, S., Sikder, O., Tamkin, A., Thamkul, J., Kaplan, J., Clark, J., & Ganguli, D. (2023). arXiv:[2306.16388](https://arxiv.org/abs/2306.16388)
+- **Contributes:** Per the abstract: LLMs may not represent diverse global perspectives equitably; proposes a framework to measure whose opinions model responses resemble.
+- **How SocietyTwin uses it:** Cross-national framing for checking whether persona agents reflect Turkish rather than other countries' opinion patterns.
+- **Limitations / relevance:** TODO: Requires source review (whether Türkiye-specific items are included).
+
+### Marked Personas: Using Natural Language Prompts to Measure Stereotypes in Language Models
+
+- **Citation:** Cheng, M., Durmus, E., & Jurafsky, D. (2023). *Proceedings of the 61st Annual Meeting of the ACL (Volume 1: Long Papers)*, 1504–1532. doi:[10.18653/v1/2023.acl-long.84](https://doi.org/10.18653/v1/2023.acl-long.84)
+- **Contributes:** Per the abstract: a prompt-based method to measure stereotypes in LLM-generated personas for intersectional demographic groups.
+- **How SocietyTwin uses it:** Basis for the stereotype audit of persona rationales ([validation-strategy.md §3](validation-strategy.md#3-persona-consistency-evidence-c)).
+- **Limitations / relevance:** English-language study; Turkish-language behaviour must be checked separately.
+
+### Large language models that replace human participants can harmfully misportray and flatten identity groups
+
+- **Citation:** Wang, A., Morgenstern, J., & Dickerson, J. P. (2025). *Nature Machine Intelligence*, 7(3), 400–411 (published 17 February 2025). doi:[10.1038/s42256-025-00986-z](https://doi.org/10.1038/s42256-025-00986-z)
+- **Contributes:** Argues and shows (with 3,200 human participants across 16 identities and 4 LLMs) that LLM stand-ins can misportray and flatten demographic groups.
+- **How SocietyTwin uses it:** Central to the ethics and limitations framing: no claims that personas represent real Turkish people; within-group variance must be reported.
+- **Limitations / relevance:** Results concern the identities and models studied; Türkiye was not the focus.
+
+## Validation research
+
+Research on validating agent-based models, synthetic data, and LLM social simulations, including reporting standards.
 
 ### Empirical Validation of Agent-Based Models: Alternatives and Prospects
 
@@ -153,57 +215,6 @@ This document records the academic, technical, and data sources behind SocietyTw
 - **How SocietyTwin uses it:** Supports comparing *group-level response distributions* (not individual answers) in experiment validity, and sets realistic expectations.
 - **Limitations / relevance:** Datasets are not Türkiye-specific.
 
-### C. Persona-conditioned LLM agents: fidelity, bias, and robustness
-
-### Out of One, Many: Using Language Models to Simulate Human Samples
-
-- **Citation:** Argyle, L. P., Busby, E. C., Fulda, N., Gubler, J., Rytting, C., & Wingate, D. (2023). *Political Analysis*. doi:[10.1017/pan.2023.2](https://doi.org/10.1017/pan.2023.2)
-- **Contributes:** Per the abstract: proposes studying language models as proxies for specific human sub-populations, arguing that model biases are not uniform properties of a model.
-- **How SocietyTwin uses it:** Motivates conditioning agents on demographic persona cards and comparing responses by subgroup.
-- **Limitations / relevance:** Evidence comes from another national context; transfer to Türkiye and to Turkish-language prompts is untested.
-
-### Using Large Language Models to Simulate Multiple Humans and Replicate Human Subject Studies
-
-- **Citation:** Aher, G., Arriaga, R. I., & Kalai, A. T. (2023). ICML 2023. arXiv:[2208.10264](https://arxiv.org/abs/2208.10264)
-- **Contributes:** Per the abstract: introduces "Turing Experiments" to test how far a model can simulate aspects of human behaviour, and shows they can reveal consistent distortions.
-- **How SocietyTwin uses it:** Informs the design of replication-style checks and the expectation of systematic distortions.
-- **Limitations / relevance:** Replicates known studies; does not address national population synthesis.
-
-### LLM Agents Grounded in Self-Reports Enable General-Purpose Simulation of Individuals
-
-- **Citation:** Park, J. S., Zou, C. Q., Kamphorst, J., Egan, N., Shaw, A., Hill, B. M., Cai, C., Morris, M. R., Liang, P., Willer, R., & Bernstein, M. S. (2024, revised 2026). arXiv:[2411.10109](https://arxiv.org/abs/2411.10109). Earlier versions were titled "Generative Agent Simulations of 1,000 People".
-- **Contributes:** Per the abstract: agents built from interviews and surveys of 1,052 Americans reached 82–86% of individual test–retest consistency on held-out items, versus 74% for demographic-only baselines.
-- **How SocietyTwin uses it:** SocietyTwin personas are **demographic-only by design** (no real-person data), so this paper sets the expectation that their fidelity is limited and must be measured, and it motivates demographic-only baselines.
-- **Limitations / relevance:** Relies on real interview data, which SocietyTwin does not use; US sample.
-
-### Whose Opinions Do Language Models Reflect?
-
-- **Citation:** Santurkar, S., Durmus, E., Ladhak, F., Lee, C., Liang, P., & Hashimoto, T. (2023). arXiv:[2303.17548](https://arxiv.org/abs/2303.17548) (published at ICML 2023; proceedings details to verify).
-- **Contributes:** Per the abstract: a quantitative framework for measuring which opinions LMs reflect, using public opinion polls and their human responses.
-- **How SocietyTwin uses it:** Informs distribution-comparison metrics (for example Jensen–Shannon divergence) and awareness of model opinion bias.
-- **Limitations / relevance:** US opinion polls.
-
-### Towards Measuring the Representation of Subjective Global Opinions in Language Models
-
-- **Citation:** Durmus, E., Nguyen, K., Liao, T. I., Schiefer, N., Askell, A., Bakhtin, A., Chen, C., Hatfield-Dodds, Z., Hernandez, D., Joseph, N., Lovitt, L., McCandlish, S., Sikder, O., Tamkin, A., Thamkul, J., Kaplan, J., Clark, J., & Ganguli, D. (2023). arXiv:[2306.16388](https://arxiv.org/abs/2306.16388)
-- **Contributes:** Per the abstract: LLMs may not represent diverse global perspectives equitably; proposes a framework to measure whose opinions model responses resemble.
-- **How SocietyTwin uses it:** Cross-national framing for checking whether persona agents reflect Turkish rather than other countries' opinion patterns.
-- **Limitations / relevance:** TODO: Requires source review (whether Türkiye-specific items are included).
-
-### Marked Personas: Using Natural Language Prompts to Measure Stereotypes in Language Models
-
-- **Citation:** Cheng, M., Durmus, E., & Jurafsky, D. (2023). *Proceedings of the 61st Annual Meeting of the ACL (Volume 1: Long Papers)*, 1504–1532. doi:[10.18653/v1/2023.acl-long.84](https://doi.org/10.18653/v1/2023.acl-long.84)
-- **Contributes:** Per the abstract: a prompt-based method to measure stereotypes in LLM-generated personas for intersectional demographic groups.
-- **How SocietyTwin uses it:** Basis for the stereotype audit of persona rationales ([validation-strategy.md §3](validation-strategy.md#3-persona-consistency)).
-- **Limitations / relevance:** English-language study; Turkish-language behaviour must be checked separately.
-
-### Large language models that replace human participants can harmfully misportray and flatten identity groups
-
-- **Citation:** Wang, A., Morgenstern, J., & Dickerson, J. P. (2025). *Nature Machine Intelligence*, 7, 400–411. doi:[10.1038/s42256-025-00986-z](https://doi.org/10.1038/s42256-025-00986-z)
-- **Contributes:** Argues and shows (with 3,200 human participants across 16 identities and 4 LLMs) that LLM stand-ins can misportray and flatten demographic groups.
-- **How SocietyTwin uses it:** Central to the ethics and limitations framing: no claims that personas represent real Turkish people; within-group variance must be reported.
-- **Limitations / relevance:** Results concern the identities and models studied; Türkiye was not the focus.
-
 ### LLM-Based Social Simulations Require a Boundary
 
 - **Citation:** Wu, Z., Peng, R., Ito, T., Onizuka, M., & Xiao, C. (2026). ICML 2026 Position Paper Track. arXiv:[2506.19806](https://arxiv.org/abs/2506.19806)
@@ -218,7 +229,16 @@ This document records the academic, technical, and data sources behind SocietyTw
 - **How SocietyTwin uses it:** Basis for robustness audits before any conclusion is drawn from persona experiments.
 - **Limitations / relevance:** Preprint; case studies are games and social-media models rather than surveys.
 
+### Position: Synthetic Persona Needs Explicit Grounding and Standardized Reporting
+
+- **Citation:** MatrAIx Research Community (2026). Accepted at the COLM 2026 Workshop on Social Simulation with LLMs. <https://matraix.ai/research/synthetic-persona-grounding.html>
+- **Contributes:** A six-item reporting checklist for persona studies: persona provenance, grounding evidence, selection or sampling logic, internal consistency checks, enactment checks, intended use and inference scope.
+- **How SocietyTwin uses it:** Adopted for every SocietyTwin validation report.
+- **Limitations / relevance:** Workshop position paper; arXiv version listed as forthcoming.
+
 ## Reference systems
+
+Existing systems used as architectural inspiration or comparison.
 
 ### MatrAIx: Simulating the World with 8.3 Billion Persona Agents
 
@@ -226,13 +246,6 @@ This document records the academic, technical, and data sources behind SocietyTw
 - **Contributes:** Per the paper: a population-scale simulated-user evaluation infrastructure for AI systems and digital products. Persona 8B has 8.3 billion records over 1,290 categorical dimensions (Background, Psychology, Capability, Behavior and Interaction, Lifestyle), sampled from a dependency graph with compatibility masks or derived from human-authored sources; a ~1M coreset is released. The Playground has Survey, AI Chatbot, Web, and App environments; each trial stores persona, task, agent, model, and seed; run manifests keep the requested and realised cohort. Validation includes a 400-trial adherence study (91.5%).
 - **How SocietyTwin uses it:** Main architectural inspiration: DAG sampling with masks, separation of records from LLM agents, cohort selection, per-trial telemetry, run manifests, adherence tests, cross-model checks ([report §7](societytwin-v2-architecture.md#7-reference-systems)).
 - **Limitations / relevance:** Different purpose (product evaluation) and global scope; SocietyTwin does **not** copy its schema size, its human-grounded extraction from web sources, or its Web/App environments. MatrAIx itself states that human studies remain necessary before applying conclusions to real populations.
-
-### Position: Synthetic Persona Needs Explicit Grounding and Standardized Reporting
-
-- **Citation:** MatrAIx Research Community (2026). Accepted at the COLM 2026 Workshop on Social Simulation with LLMs. <https://matraix.ai/research/synthetic-persona-grounding.html>
-- **Contributes:** A six-item reporting checklist for persona studies: persona provenance, grounding evidence, selection or sampling logic, internal consistency checks, enactment checks, intended use and inference scope.
-- **How SocietyTwin uses it:** Adopted for every SocietyTwin validation report.
-- **Limitations / relevance:** Workshop position paper; arXiv version listed as forthcoming.
 
 ### Social Simulation Arena
 
@@ -293,9 +306,9 @@ This document records the academic, technical, and data sources behind SocietyTw
 - **How SocietyTwin uses it:** Mesa is optional in v2, for small interaction experiments; mesa-frames is a candidate if large rule-based ABMs are needed ([report §12](societytwin-v2-architecture.md#12-scalability-strategy)).
 - **Limitations / relevance:** mesa-frames does not state a stable release status.
 
-## Data sources
+## Türkiye data sources
 
-Details and access status: [data-strategy.md](data-strategy.md).
+Official statistics, legal texts, and licences. Details and access status: [data-strategy.md](data-strategy.md).
 
 ### Official Statistics Programme 2022–2026
 
@@ -309,7 +322,7 @@ Details and access status: [data-strategy.md](data-strategy.md).
 - **Citation:** TÜİK (February 2026). *Adrese Dayalı Nüfus Kayıt Sistemi Sonuçları, 2025*. <https://www.tuik.gov.tr/media/announcements/ADNKS_2025TR.pdf>; official announcement by TurkStat: population of Türkiye 86,092,168.
 - **Contributes:** Resident population by province, sex, and age; degree of urbanisation shares.
 - **How SocietyTwin uses it:** Root joint distribution of the generator and the population anchor for reconciliation.
-- **Limitations / relevance:** Reuse terms **OPEN DECISION**.
+- **Limitations / relevance:** Reuse terms **OPEN DECISION**. Province figures used as examples (for example Bayburt, 82,836 residents, reported as the least populous province) come from news summaries of this release and must be checked against the TÜİK table.
 
 ### Other TÜİK statistics used
 
@@ -327,8 +340,8 @@ Details and access status: [data-strategy.md](data-strategy.md).
 
 ### Personal Data Protection Law No. 6698 (KVKK)
 
-- **Citation:** Republic of Türkiye, Law No. 6698 on the Protection of Personal Data (24 March 2016).
-- **Contributes:** Article 6 defines special categories of personal data; Article 28(b) (as cited in TÜİK's Official Statistics Programme) exempts processing for research, planning, and statistics when data is anonymised.
+- **Citation:** Republic of Türkiye, Law No. 6698 on the Protection of Personal Data (24 March 2016). Official English text: <https://www.kvkk.gov.tr/Icerik/6649/Personal-Data-Protection-Law>
+- **Contributes:** Article 6 defines special categories of personal data (race, ethnic origin, political opinion, philosophical belief, religion, religious sect or other belief, appearance, membership of associations, foundations or trade unions, health, sexual life, criminal convictions and security measures, and biometric and genetic data); Article 28(b) (as cited in TÜİK's Official Statistics Programme) exempts processing for research, planning, and statistics when data is anonymised.
 - **How SocietyTwin uses it:** Basis for excluding special-category attributes and for the privacy design ([ethics-and-limitations.md](ethics-and-limitations.md)).
 - **Limitations / relevance:** Legal interpretation should be confirmed by the course or university if questions arise.
 
@@ -341,12 +354,14 @@ Details and access status: [data-strategy.md](data-strategy.md).
 
 ### World Population Prospects 2024
 
-- **Citation:** United Nations, Department of Economic and Social Affairs, Population Division (2024). *World Population Prospects 2024*. Licence: CC BY 3.0 IGO. <https://population.un.org/wpp/>
+- **Citation:** United Nations, Department of Economic and Social Affairs, Population Division (2024). *World Population Prospects 2024*. <https://population.un.org/wpp/>. The *Summary of Results* states that its figures and tables may be reproduced under CC BY 3.0 IGO; the licence of the downloadable data files is **not confirmed** (OPEN DECISION).
 - **Contributes:** National population estimates and projections.
 - **How SocietyTwin uses it:** Cross-check of national totals.
 - **Limitations / relevance:** Modelled estimates; national level.
 
-## Future-research sources
+## Future research
+
+Sources relevant to stretch goals or later work.
 
 ### Agent-Based Computational Economics: Growing Economies From the Bottom Up
 
@@ -376,6 +391,19 @@ Details and access status: [data-strategy.md](data-strategy.md).
 - **Contributes:** Deep generative models for population synthesis.
 - **How SocietyTwin uses it:** FUTURE WORK: an alternative generator for high-dimensional schemas.
 - **Limitations / relevance:** Requires microdata for training; harder to explain and validate.
+
+## Source audit (latest pass)
+
+| Source | Result |
+|---|---|
+| Wang, Morgenstern & Dickerson (2025) | Verified in Crossref; issue number (3) and publication date added |
+| Santurkar et al. (2023) | ICML 2023 publication verified in PMLR (volume 202, pages 29971–30004); "details to verify" note removed |
+| UN World Population Prospects 2024 | **Corrected:** the primary source applies CC BY 3.0 IGO to the publication's figures and tables; the data-file licence is now marked as not confirmed |
+| KVKK Law No. 6698, Article 6 | Verified against the official English text on kvkk.gov.tr; full list of special categories added |
+| ADNKS 2025 | Total population verified (TurkStat official announcement); province-level example flagged as coming from news summaries, to be verified in the TÜİK table |
+| 2025–2026 papers (MatrAIx, grounding position paper, SimBench, AgentSociety, Park et al. 2024, Wu et al. 2026, Ye et al. 2026) | Verified on arXiv, the official repository, or the project website; venues stated only where the primary page states them |
+| Park et al. (2024) | Title follows the current arXiv version; the earlier title is recorded |
+| Ye et al. (2009) | Conference paper without a DOI; details from secondary indexes; **flagged** for full-text confirmation before citing |
 
 ## How the sources map to the v2 architecture
 

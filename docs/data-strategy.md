@@ -2,7 +2,7 @@
 
 > **Status: PROPOSED.** No dataset has been downloaded, and no dataset is committed to this repository. Access, table formats, years, and reuse terms must be confirmed in the data-feasibility phase.
 
-SocietyTwin is **CONFIRMED** to be Türkiye-only. Its synthetic population is built from **official aggregate statistics**, with TÜİK (Turkish Statistical Institute) as the primary source. Attribute-level details are in [persona-schema.md](persona-schema.md).
+SocietyTwin is **CONFIRMED** to be Türkiye-only. Its synthetic population is built from **official aggregate statistics**, with TÜİK (Turkish Statistical Institute) as the primary candidate source; other sources only supplement or cross-check where justified. Attribute-level details, including each attribute's data status (CONFIRMED DATA, CANDIDATE DATA, PROPOSED, OPEN DECISION), are in [persona-schema.md](persona-schema.md).
 
 ## 1. Principles
 
@@ -13,7 +13,7 @@ SocietyTwin is **CONFIRMED** to be Türkiye-only. Its synthetic population is bu
 
 ## 2. Source catalogue
 
-Geographic levels and periodicity below are taken from TÜİK's **Official Statistics Programme 2022–2026** (primary source, see [sources.md](sources.md#data-sources)). İBBS is Türkiye's statistical regional unit classification: NUTS-1 has 12 regions, NUTS-2 has 26 regions, and NUTS-3 corresponds to the 81 provinces.
+Geographic levels and periodicity below are taken from TÜİK's **Official Statistics Programme 2022–2026** (primary source, see [sources.md](sources.md#türkiye-data-sources)). İBBS is Türkiye's statistical regional unit classification: NUTS-1 has 12 regions, NUTS-2 has 26 regions, and NUTS-3 corresponds to the 81 provinces.
 
 | Source | Producer | Content used by SocietyTwin | Geographic level | Periodicity | Access | Reuse / licence | Status |
 |---|---|---|---|---|---|---|---|
@@ -30,7 +30,7 @@ Geographic levels and periodicity below are taken from TÜİK's **Official Stati
 | Life Satisfaction Survey | TÜİK | Held-out survey aggregates for experiment validity | *verify* | Annual | Press release, tables | **OPEN DECISION** | MVP candidate for validity pilot |
 | Türkiye Demographic and Health Survey | Hacettepe University Institute of Population Studies | Fertility, family, health indicators | Türkiye, urban–rural, 5 regions, NUTS-1 (specific indicators) | Every 5 years | Reports; data on application (*verify*) | **OPEN DECISION** | FUTURE WORK |
 | World Bank indicators | World Bank | National cross-checks | Türkiye (national) | Annual | Open data | CC BY 4.0 (verified) | Cross-check only |
-| UN World Population Prospects 2024 | UN DESA Population Division | National population cross-check | Türkiye (national) | Periodic revisions (latest: 2024) | Open data | CC BY 3.0 IGO (verified) | Cross-check only |
+| UN World Population Prospects 2024 | UN DESA Population Division | National population cross-check | Türkiye (national) | Periodic revisions (latest: 2024) | Open data | Figures and tables in the publication: CC BY 3.0 IGO; data-file licence **OPEN DECISION** | Cross-check only |
 | Eurostat | European Commission | Harmonised indicators where Türkiye is covered | Varies | Varies | Open data | Coverage for Türkiye **verify** | FUTURE WORK |
 
 TÜİK publications state that TÜİK reserves the rights to its publications under Law No. 5846. The reuse terms for tables downloaded from the TÜİK data portal have **not** been confirmed and are recorded as an **OPEN DECISION**.

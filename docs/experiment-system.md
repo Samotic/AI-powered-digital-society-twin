@@ -2,24 +2,33 @@
 
 > **Status: PROPOSED.** Not implemented. The persona-to-agent activation diagram is in [report §14](societytwin-v2-architecture.md#14-ai-agent-architecture) and the experiment lifecycle diagram in [report §15](societytwin-v2-architecture.md#15-experiment-playground).
 
-The Experiment Playground lets a researcher or student run **reproducible experiments on sampled cohorts** of the synthetic Turkish population. It is inspired by the MatrAIx Playground ([Li et al., 2026](sources.md#reference-systems)), but is much smaller and uses only environments that can be validated in one semester.
+The Experiment Playground lets a researcher or student run **reproducible experiments on sampled cohorts** of the synthetic Turkish population. It is inspired by architectural ideas from the MatrAIx Playground ([Li et al., 2026](sources.md#reference-systems)), but it is much smaller and uses only environments that can be validated in one semester.
 
-## 1. Researcher workflow
+**LLMs are used only in step 8 onwards, and only for the sampled personas activated as agents.** Population records are never processed by an LLM.
+
+## 1. User flow
+
+```text
+Create Experiment → Select Population Build → Filter Cohort → Choose Sample Size
+→ Configure Scenario → Choose Environment → Configure AI Model (if needed)
+→ Run → Monitor → Analyze → Compare Subgroups → Export → Reproduce
+```
 
 | Step | What the user does | System behaviour |
 |---|---|---|
-| 1 | Choose a population build | Lists builds with schema version, size, seed, and validation status |
-| 2 | Filter demographics | Structured filters on record attributes (for example province in NUTS-2 TR51, age 18–29, employed). Filters are data, not free-form SQL. |
-| 3 | Choose sample size and sampling method | Simple random or stratified sampling with a seed; shows realised subgroup counts before running |
-| 4 | Configure the scenario | Selects an instrument (questionnaire or scenario text) and its version |
-| 5 | Choose the experiment type | SURVEY or SCENARIO in the MVP (section 3) |
-| 6 | Choose the AI model | Provider-independent model setting; a deterministic stub model is always available for testing |
-| 7 | Run | The system validates the configuration, shows a token and cost estimate, and queues the job |
-| 8 | Monitor progress | Trial counts by state, errors, cache hits, tokens used |
-| 9 | Inspect responses | Browse structured answers and rationales per persona, with the persona card shown alongside |
-| 10 | Compare subgroups | Response distributions by subgroup, with weights and uncertainty |
-| 11 | Export | CSV or Parquet of trial-level and aggregated results |
-| 12 | Reproduce | Re-run from the manifest (replay from cache, or fresh run with a new or same seed) |
+| 1. Create Experiment | Names the experiment and states its purpose | Creates a draft experiment record |
+| 2. Select Population Build | Chooses a build | Lists builds with schema version, size, seed, and validation status |
+| 3. Filter Cohort | Sets demographic filters (for example NUTS-2 region TR51, age 18–29, employed) | Structured filters on record attributes; filters are data, not free-form SQL; shows how many records match |
+| 4. Choose Sample Size | Sets the cohort size and sampling method | Simple random or stratified sampling with a seed; shows realised subgroup counts |
+| 5. Configure Scenario | Selects an instrument (questionnaire or scenario text), its version, and any conditions | Validates the instrument and the condition assignment |
+| 6. Choose Environment | SURVEY or SCENARIO in the MVP (section 3) | Loads the environment's answer schema |
+| 7. Configure AI Model (if needed) | Chooses a model, generation parameters, repetitions, and a budget | Provider-independent setting; a deterministic stub model is always available; shows a token and cost estimate |
+| 8. Run | Starts the experiment | Validates the configuration and queues the job; persona cards are constructed and agents activated trial by trial |
+| 9. Monitor | Watches progress | Trial counts by state, errors, cache hits, tokens used, budget remaining |
+| 10. Analyze | Reviews results | Response browser with persona cards; validity flags; persona-consistency checks |
+| 11. Compare Subgroups | Compares groups | Weighted response distributions by subgroup, with intervals and subgroup sizes |
+| 12. Export | Downloads results | CSV or Parquet of trial-level and aggregated results, with the synthetic-data label |
+| 13. Reproduce | Re-runs from the manifest | Replay from the cache (identical), or a fresh run with the same or a new seed (variation reported) |
 
 ## 2. Cohort selection and sampling
 
@@ -53,8 +62,8 @@ An **instrument** is a versioned file in `configs/instruments/` (target layout) 
 - **Activation.** For each trial, a persona card (from [persona-schema.md](persona-schema.md#8-persona-layer-level-2)), the instrument item, and a versioned prompt template are combined into a request. The unknowns statement tells the agent not to invent unmodelled attributes.
 - **Model adapter.** A provider-independent interface (`generate_structured(request, schema, params) → result, usage`). Implementations can target hosted APIs or a local model server. Which provider to use is an **OPEN DECISION** (budget, data-protection terms, Turkish-language quality).
 - **Structured outputs.** Answers are validated against the item's JSON schema. Invalid outputs are retried a bounded number of times, then recorded as `invalid_output`.
-- **Asynchronous execution.** Trials run concurrently in a worker with a configurable concurrency limit, retry with backoff, and rate-limit handling.
-- **Cache.** Responses are cached under a key built from the model identifier, prompt template version, persona hash, item, and generation parameters. Replaying an experiment reads from the cache.
+- **Asynchronous and batched execution.** Trials run concurrently in a worker with a configurable concurrency limit, retry with backoff, and rate-limit handling. Provider batch APIs may be used for large offline runs where available (optional).
+- **Cache.** Responses are cached under a key built from the model identifier and version, persona schema version, persona card template version, prompt template version, persona hash, item, and generation parameters. Replaying an experiment reads from the cache.
 - **Budget guard.** Each experiment has a maximum number of calls and tokens. The run stops cleanly when the budget is reached.
 - **Stub model.** A deterministic fake model is used in tests and demos, so that the full pipeline runs without any API key.
 
@@ -64,11 +73,15 @@ An **instrument** is a versioned file in `configs/instruments/` (target layout) 
 
 | Field group | Fields |
 |---|---|
-| Identity | `experiment_id`, `trial_id`, `build_id`, `record_id`, `item_id`, `repetition` |
-| Configuration | environment, instrument ID and version, prompt template version, model provider, name, and version, generation parameters, seed |
+| Identity | `experiment_id`, `trial_id`, `build_id`, `record_id`, `item_id`, `repetition`, condition |
+| Versions | persona schema version, persona card template version, prompt template version, instrument ID and version, adapter version |
+| Model | provider, model name, model version or snapshot identifier |
+| Parameters | temperature, maximum output tokens, other sampling parameters, provider-side seed where supported, experiment seed, configuration hash |
 | Output | structured answer, optional rationale, validity flag, error |
-| Usage | latency, input tokens, output tokens, estimated cost, cache hit |
+| Response metadata | finish reason, provider response ID (if available), latency, input tokens, output tokens, estimated cost, cache hit |
 | Time | created, started, finished |
+
+The full list and its rationale are in [report §14.1](societytwin-v2-architecture.md#141-metadata-recorded-for-every-ai-call).
 
 **Aggregated results** use a long format: `experiment_id`, `item_id`, subgroup keys, response category, weighted share, unweighted count, and interval estimate. Aggregates are stored separately from trial records and are recomputable from them.
 

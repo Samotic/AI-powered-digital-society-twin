@@ -27,7 +27,7 @@ An **ablation** build with independently sampled attributes is generated for com
 
 ## 5. Population validation
 
-Each build is evaluated for statistical representativeness (marginal fit) and conditional consistency (held-out cross-tabulations, association strength, constraint violations, rare cells), across several seeds and at 10K, 100K, and 1M records. Metrics and their justification are in [validation-strategy.md](validation-strategy.md). Acceptance thresholds are agreed with the instructor after the first measurements.
+Each build is compared with the source tables used in generation (statistical representativeness, an implementation check) and with held-out official tables not used in generation (conditional consistency: association strength, constraint violations, rare cells), across several seeds and at the benchmark scales of 10K, 100K, and 1M records. Metrics and their justification are in [validation-strategy.md](validation-strategy.md). Acceptance thresholds are agreed with the instructor after the first measurements.
 
 ## 6. Cohort sampling
 

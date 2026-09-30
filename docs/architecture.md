@@ -51,7 +51,7 @@ The current repository still has the research-phase placeholders under `src/`. T
 - **Testing:** artificial tables with known errors (missing cells, bad codes, inconsistent totals) must be reported; harmonisation mappings are round-trip tested.
 
 ### `persona`
-- **Purpose:** define the versioned persona schema and render personas from records.
+- **Purpose:** define the versioned persona schema and construct personas from sampled records.
 - **Input:** schema files in `configs/schema/`; population records.
 - **Output:** schema objects (attributes, categories, parents, provenance, constraints); persona cards and unknowns statements.
 - **Main responsibilities:** schema loading and validation; category encodings; hard-constraint definitions; template-based persona rendering; the synthetic-data label.
@@ -60,7 +60,7 @@ The current repository still has the research-phase placeholders under `src/`. T
 
 ### `population`
 - **Purpose:** generate population builds.
-- **Input:** processed tables; schema version; N; seed.
+- **Input:** processed tables; schema version; build size N (configurable; benchmark scales 10K, 100K, 1M); seed.
 - **Output:** a partitioned Parquet build and its build manifest.
 - **Main responsibilities:** IPF fitting of conditionals; controlled-rounding allocation to province × sex × age cells; vectorised DAG-ordered sampling with masks; seeded streams per partition; writing builds.
 - **Dependencies:** NumPy, pandas (small tables), PyArrow, `persona`, `registry`.
@@ -94,7 +94,7 @@ The current repository still has the research-phase placeholders under `src/`. T
 - **Purpose:** instantiate personas as AI agents for single trials.
 - **Input:** persona card; instrument item and answer schema; prompt template version; model configuration.
 - **Output:** a validated structured answer with usage information.
-- **Main responsibilities:** provider-independent adapter interface; stub model; prompt templates (versioned); structured-output validation with bounded retries; asynchronous execution with concurrency limits; response cache; token and cost accounting; budget guard.
+- **Main responsibilities:** provider-independent adapter interface; stub model; prompt templates (versioned); structured-output validation with bounded retries; asynchronous (and optionally batched) execution with concurrency limits; response cache; token and cost accounting; budget guard; recording model, version, temperature and other parameters, schema and template versions, and response metadata for every call ([report §14.1](societytwin-v2-architecture.md#141-metadata-recorded-for-every-ai-call)). Agents are used only for sampled personas; population records never reach this module.
 - **Dependencies:** provider SDKs or HTTP client (behind the adapter), Pydantic, `registry`.
 - **Testing:** stub model only in CI; cache-key determinism; retry and invalid-output handling; no credentials in logs.
 
